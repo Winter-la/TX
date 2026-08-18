@@ -61,8 +61,22 @@
 
 1. 把项目推到一个 GitHub 仓库（Railway 默认从 GitHub 导入；根目录已放好 `Dockerfile` + `railway.json`）
 2. Railway → **New Project** → **Deploy from GitHub repo** → 选你的仓库
-3. 在项目里 **Add Database** → 选 **MySQL**（会自动创建，注入 `MYSQL*` 环境变量）
-4. 回到 Service 的 **Variables**，添加以下环境变量：
+3. 在项目里 **Add Database** → 选 **MySQL**（会创建一个独立的 MySQL 服务）
+4. **把 MySQL 的连接变量引用到后端服务**（关键步骤，漏了会启动失败报 `Failed to parse the host:port pair '${MYSQLHOST}:${MYSQLPORT}'`）：
+   进入你的后端 Service → **Variables** → **New Variable**，逐个添加并引用 MySQL 服务：
+
+   | 变量 | 引用值 |
+   |---|---|
+   | MYSQLHOST | `${{MySQL.MYSQLHOST}}` |
+   | MYSQLPORT | `${{MySQL.MYSQLPORT}}` |
+   | MYSQLUSER | `${{MySQL.MYSQLUSER}}` |
+   | MYSQLPASSWORD | `${{MySQL.MYSQLPASSWORD}}` |
+   | MYSQLDATABASE | `${{MySQL.MYSQLDATABASE}}` |
+
+   > 上面的 `MySQL` 是你数据库服务的名字；Railway 的 Variables 输入框里可直接点「引用」选择对应变量，不必手敲。
+   > `PORT` 由 Railway 自动注入，无需手动设置。
+
+5. 继续在同一 Variables 页面添加其余变量：
 
    | 变量 | 值 |
    |---|---|
@@ -72,9 +86,7 @@
    | STORAGE_TYPE | `s3` |
    | R2_ENDPOINT / R2_ACCESS_KEY_ID / R2_SECRET_ACCESS_KEY / R2_BUCKET / R2_PUBLIC_BASE_URL | 见第三节 |
 
-   （`MYSQLHOST/MYSQLPORT/MYSQLDATABASE/MYSQLUSER/MYSQLPASSWORD/PORT` 由 Railway 自动注入，无需手填）
-
-5. **初始化数据库**：Railway MySQL 卡片 → 打开其 **Variables** 里的 `MYSQLURL`/连接信息 → 用数据库客户端或 Railway 的 **Connect** 连进去，执行建表语句：
+6. **初始化数据库**：Railway MySQL 卡片 → 打开其 **Variables** 里的 `MYSQLURL`/连接信息 → 用数据库客户端或 Railway 的 **Connect** 连进去，执行建表语句：
    ```sql
    -- 用 data/schema.sql，但去掉开头的 CREATE DATABASE / USE 两行
    ```
