@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新闻政策公告 - 驻马店区域内中药材质量安全追溯体系信息平台</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg-overlay"></div>
+
+<header class="site-header">
+    <div class="header-content"><div class="logo-wrap">
+        <img src="images/tu/0黄淮学院校徽.png" alt="黄淮学院校徽" class="logo-img">
+        <div class="title-wrap"><h1 class="site-title">驻马店区域内中药材质量安全追溯体系信息平台</h1>
+            <p class="site-subtitle">Zhumadian Traditional Chinese Medicine Quality Safety Traceability System Information Platform</p></div>
+    </div></div>
+                <nav class="main-nav">
+        <a href="index.html">首页</a>
+        <a href="herbs.html">药材种类</a>
+        <a href="download.html">数据下载</a>
+        <a href="about.html">平台介绍</a>
+        <a href="policy.html" class="active">新闻政策公告</a>
+        <a href="javascript:void(0)" onclick="openAdminLogin()">数据上传</a>
+    </nav>
+</header>
+
+<main class="page-main">
+    <div class="content-section"><h2 class="section-title" id="news">新闻资讯</h2>
+        <ul class="news-list" id="newsList"><li style="color:#999;">加载中...</li></ul></div>
+    <div class="content-section"><h2 class="section-title" id="policy">政策法规</h2>
+        <ul class="news-list" id="policyLinks"><li style="color:#999;">加载中...</li></ul></div>
+    <div class="content-section"><h2 class="section-title" id="announce">平台公告</h2>
+        <ul class="news-list" id="announcements"><li style="color:#999;">加载中...</li></ul></div>
+</main>
+
+<footer class="site-footer">
+    <p>黄淮学院 · 驻马店区域内中药材质量安全追溯体系信息平台</p>
+    <p>&copy; 2026 智能指纹图谱技术 &nbsp;|&nbsp; 太赫兹光谱追溯</p>
+</footer>
+
+<div id="adminLoginModal" class="admin-modal-mask" style="display:none" onclick="closeAdminLogin()">
+  <div class="admin-modal" onclick="event.stopPropagation()"><button class="admin-modal-close" onclick="closeAdminLogin()">&times;</button>
+    <h3 class="admin-modal-title">Admin 系统登录</h3><input type="text" id="adminLoginUser" placeholder="用户名" value="admin">
+    <input type="password" id="adminLoginPwd" placeholder="密码" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="admin-modal-btn" onclick="adminLogin()">登 录</button><p class="admin-modal-error" id="adminLoginError"></p>
+  </div>
+</div>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/vendor/jquery.min.js"></script>
+<script>
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function safeUrl(u){return u&&/^(https:\/\/|\/(?!\/))/.test(u)?esc(u):'#'}
+$.get(apiUrl('/api/content/news'),function(data){var h='';data.forEach(function(n){h+='<li><div><a href="'+safeUrl(n.url)+'" target="_blank" rel="noopener">'+esc(n.title)+'</a><p class="news-summary">'+esc(n.summary||'')+'</p></div><span class="news-date">'+esc((n.createdAt||'').substring(0,10))+'</span></li>';});$('#newsList').html(h||'<li style="color:#999;">暂无新闻</li>');});
+$.get(apiUrl('/api/content/policy-links'),function(data){var h='';data.forEach(function(p){h+='<li><div><a href="'+safeUrl(p.url)+'" target="_blank" rel="noopener">'+esc(p.title)+'</a><p class="news-summary">'+esc(p.summary||'')+'</p></div><span class="news-date">'+esc((p.createdAt||'').substring(0,10))+'</span></li>';});$('#policyLinks').html(h||'<li style="color:#999;">暂无可显示的政策信息</li>');});
+$.get(apiUrl('/api/content/announcements'),function(data){var h='';data.forEach(function(a){h+='<li><div><a href="#" onclick="showAnnouncement('+Number(a.id)+');return false;">'+esc(a.title)+'</a><p class="news-summary">'+esc(a.content?a.content.substring(0,80)+'...':'')+'</p></div><span class="news-date">'+esc((a.createdAt||'').substring(0,10))+'</span></li>';});$('#announcements').html(h||'<li style="color:#999;">暂无公告</li>');});
+function showAnnouncement(id){$.get(apiUrl('/api/content/announcement/'+id),function(a){document.getElementById('detailTitle').textContent=a.title;document.getElementById('detailContent').textContent=a.content||'无正文';document.getElementById('detailTime').textContent=a.createdAt?a.createdAt.substring(0,10):'';var btn=document.getElementById('detailDownload');if(a.filePath){btn.href=fileUrl(a.filePath);btn.style.display='inline-block'}else{btn.style.display='none'}document.getElementById('detailModal').style.display='flex'});}
+function closeDetail(){document.getElementById('detailModal').style.display='none'}
+</script>
+<!-- 公告详情弹窗 -->
+<div id="detailModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;padding:28px;width:650px;max-width:95vw;max-height:80vh;overflow-y:auto;position:relative">
+    <button onclick="closeDetail()" style="position:absolute;top:10px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:#999">&times;</button>
+    <h3 style="color:#4a3a1f;margin-bottom:8px" id="detailTitle"></h3>
+    <p style="color:#999;font-size:12px;margin-bottom:16px" id="detailTime"></p>
+    <div style="font-size:14px;line-height:2;color:#333;white-space:pre-wrap;margin-bottom:20px" id="detailContent"></div>
+    <a id="detailDownload" href="#" target="_blank" style="display:none;background:#8a6d3b;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px">&#x1f4e5; 点击下载附件</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提出意见 - 驻马店区域内中药材质量安全追溯体系信息平台</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg-overlay"></div>
+
+<header class="site-header">
+    <div class="header-content">
+        <div class="logo-wrap">
+            <img src="images/tu/0黄淮学院校徽.png" alt="黄淮学院校徽" class="logo-img">
+            <div class="title-wrap">
+                <h1 class="site-title">驻马店区域内中药材质量安全追溯体系信息平台</h1>
+                <p class="site-subtitle">Zhumadian Traditional Chinese Medicine Quality Safety Traceability System Information Platform</p>
+            </div>
+        </div>
+    </div>
+    <nav class="main-nav">
+        <a href="index.html">首页</a>
+        <a href="herbs.html">药材种类</a>
+        <a href="download.html">数据下载</a>
+        <a href="about.html">平台介绍</a>
+        <a href="policy.html">新闻政策公告</a>
+        <a href="javascript:void(0)" onclick="openAdminLogin()">数据上传</a>
+    </nav>
+</header>
+
+<main class="page-main">
+    <div class="content-section">
+        <h2 class="section-title">&#x1f4ac; 提出意见</h2>
+        <p class="section-text" style="margin-bottom:24px;">
+            感谢您使用本平台。您的每一条意见都是我们改进的动力，欢迎对平台功能、数据内容或使用体验提出宝贵建议。
+        </p>
+
+        <form id="feedbackForm" enctype="multipart/form-data">
+            <!-- 第 1 步：问题类型 -->
+            <div class="fb-step">
+                <h3 class="fb-step-title">1. 请选择您要反馈的问题类型</h3>
+                <div class="fb-type-grid">
+                    <label class="fb-type-option">
+                        <input type="radio" name="type" value="功能建议" checked><span>功能建议</span>
+                    </label>
+                    <label class="fb-type-option">
+                        <input type="radio" name="type" value="体验问题"><span>体验问题</span>
+                    </label>
+                    <label class="fb-type-option">
+                        <input type="radio" name="type" value="数据问题"><span>数据问题</span>
+                    </label>
+                    <label class="fb-type-option">
+                        <input type="radio" name="type" value="其他"><span>其他</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 第 2 步：详细说明 + 截图 -->
+            <div class="fb-step">
+                <h3 class="fb-step-title">2. 请补充详细说明、截图等</h3>
+                <div class="fb-upload-row">
+                    <div class="fb-upload" id="fbUploadBox" title="点击上传截图（选填）">
+                        <span class="fb-upload-plus">+</span>
+                    </div>
+                    <input type="file" id="fbFile" name="file" accept="image/*" style="display:none">
+                    <p class="fb-upload-tip">点击左侧方框上传问题截图（选填，支持 png / jpg / gif / webp，不超过 5MB）</p>
+                </div>
+                <textarea id="fbContent" name="content" class="fb-textarea" maxlength="1000"
+                          placeholder="您可以上传遇到问题的截图，或者对问题进行详细描述"></textarea>
+                <div class="fb-counter"><span id="fbContentCount">0</span>/1000</div>
+            </div>
+
+            <!-- 第 3 步：联系方式（选填） -->
+            <div class="fb-step">
+                <h3 class="fb-step-title">3. 如果您愿意，可留下您的联系方式（微信号、手机号等），方便我们联系到您</h3>
+                <input type="text" id="fbContact" name="contact" class="fb-input" maxlength="100"
+                       placeholder="请输入您的联系方式（选填）">
+                <div class="fb-counter"><span id="fbContactCount">0</span>/100</div>
+            </div>
+
+            <button type="submit" class="fb-submit">提 交 意 见</button>
+        </form>
+        <div class="fb-result" id="fbResult"></div>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <p>黄淮学院 · 驻马店区域内中药材质量安全追溯体系信息平台</p>
+    <p>&copy; 2026 智能指纹图谱技术 &nbsp;|&nbsp; 太赫兹光谱追溯</p>
+</footer>
+
+<!-- 管理登录模态框（与全站一致） -->
+<div id="adminLoginModal" class="admin-modal-mask" style="display:none" onclick="closeAdminLogin()">
+  <div class="admin-modal" onclick="event.stopPropagation()">
+    <button class="admin-modal-close" onclick="closeAdminLogin()" title="关闭">&times;</button>
+    <h3 class="admin-modal-title">Admin 系统登录</h3>
+    <input type="text" id="adminLoginUser" placeholder="用户名" value="admin">
+    <input type="password" id="adminLoginPwd" placeholder="密码" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="admin-modal-btn" onclick="adminLogin()">登 录</button>
+    <p class="admin-modal-error" id="adminLoginError"></p>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+/* ================= 字数统计 ================= */
+(function () {
+    var content = document.getElementById('fbContent');
+    var contact = document.getElementById('fbContact');
+    content.addEventListener('input', function () {
+        document.getElementById('fbContentCount').textContent = content.value.length;
+    });
+    contact.addEventListener('input', function () {
+        document.getElementById('fbContactCount').textContent = contact.value.length;
+    });
+})();
+
+/* ================= 截图上传预览 ================= */
+(function () {
+    var box = document.getElementById('fbUploadBox');
+    var input = document.getElementById('fbFile');
+    box.addEventListener('click', function () { input.click(); });
+    input.addEventListener('change', function () {
+        var f = input.files && input.files[0];
+        if (!f) return;
+        if (f.size > 5 * 1024 * 1024) { alert('截图不能超过 5MB'); input.value = ''; return; }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            box.classList.add('has-img');
+            var img = document.getElementById('fbPreviewImg');
+            if (!img) {
+                img = document.createElement('img');
+                img.id = 'fbPreviewImg';
+                box.appendChild(img);
+            }
+            img.src = e.target.result;
+            var rm = document.getElementById('fbRemoveBtn');
+            if (!rm) {
+                rm = document.createElement('span');
+                rm.className = 'fb-upload-remove';
+                rm.id = 'fbRemoveBtn';
+                rm.textContent = '移除';
+                box.appendChild(rm);
+            }
+            rm.onclick = function (ev) {
+                ev.stopPropagation();
+                clearPreview();
+            };
+        };
+        reader.readAsDataURL(f);
+    });
+    window.clearPreview = function () {
+        input.value = '';
+        box.classList.remove('has-img');
+        var img = document.getElementById('fbPreviewImg');
+        var rm = document.getElementById('fbRemoveBtn');
+        if (img) img.remove();
+        if (rm) rm.remove();
+    };
+})();
+
+/* ================= 提交 ================= */
+document.getElementById('feedbackForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var form = this;
+    var msg = document.getElementById('fbResult');
+    var content = document.getElementById('fbContent').value.trim();
+    if (!content) {
+        msg.className = 'fb-result error';
+        msg.textContent = '请填写意见内容';
+        return;
+    }
+    var btn = form.querySelector('.fb-submit');
+    btn.disabled = true;
+    msg.className = 'fb-result error';
+    msg.textContent = '提交中，请稍候...';
+    fetch(apiUrl('/api/feedback'), { method: 'POST', body: new FormData(form) })
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+            btn.disabled = false;
+            if (d.success) {
+                msg.className = 'fb-result success';
+                msg.textContent = d.message;
+                form.reset();
+                document.getElementById('fbContentCount').textContent = '0';
+                document.getElementById('fbContactCount').textContent = '0';
+                if (window.clearPreview) window.clearPreview();
+            } else {
+                msg.className = 'fb-result error';
+                msg.textContent = d.error || '提交失败';
+            }
+        })
+        .catch(function () {
+            btn.disabled = false;
+            msg.className = 'fb-result error';
+            msg.textContent = '无法连接服务器，请稍后再试';
+        });
+});
+</script>
+</body>
+</html>

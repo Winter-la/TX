@@ -1,0 +1,21 @@
+# 构建产物
+backend/target/
+
+# 运行时上传数据（用户数据，不入库）
+backend/uploads/
+uploads/
+
+# IDE
+.idea/
+*.iml
+
+# 日志
+logs/
+*.log
+
+# 遗留文件
+err.txt
+
+# 系统文件
+.DS_Store
+Thumbs.db

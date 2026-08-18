@@ -1,0 +1,153 @@
+{
+  "info": {
+    "name": "智能指纹图谱平台 · 产品数据库",
+    "version": "1.0",
+    "updated": "2024-07-15",
+    "description": "存储产品追溯信息、太赫兹光谱检测数据、光谱特征标签"
+  },
+  "products": [
+    {
+      "code": "001",
+      "name": "当归",
+      "alias": "岷县当归",
+      "type": "中草药",
+      "origin": "甘肃 · 岷县",
+      "latin": "Angelica sinensis",
+      "part": "根",
+      "description": "伞形科植物当归的干燥根，具有补血活血、调经止痛之功效",
+      "conclusion": "正品 · 无掺假",
+      "spectrum": {
+        "tech": "太赫兹时域光谱 + 拉曼光谱",
+        "test_date": "2024-06-18",
+        "match_rate": "98.7",
+        "grade": "一级",
+        "tags": [
+          "吸收峰 0.52 THz",
+          "吸收峰 1.04 THz",
+          "折射率 1.74",
+          "吸收系数 8.3 cm⁻¹",
+          "特征匹配度 96.2%"
+        ]
+      }
+    },
+    {
+      "code": "002",
+      "name": "茯苓",
+      "alias": "湖南茯苓",
+      "type": "中草药",
+      "origin": "湖南 · 怀化",
+      "latin": "Wolfiporia extensa",
+      "part": "菌核",
+      "description": "多孔菌科真菌茯苓的干燥菌核，具有利水渗湿、健脾宁心之功效",
+      "conclusion": "正品 · 无掺假",
+      "spectrum": {
+        "tech": "太赫兹时域光谱 + 拉曼光谱",
+        "test_date": "2024-06-20",
+        "match_rate": "97.2",
+        "grade": "一级",
+        "tags": [
+          "吸收峰 0.48 THz",
+          "吸收峰 0.96 THz",
+          "折射率 1.62",
+          "吸收系数 7.1 cm⁻¹",
+          "特征匹配度 95.8%"
+        ]
+      }
+    },
+    {
+      "code": "003",
+      "name": "人参",
+      "alias": "长白山人参",
+      "type": "中草药",
+      "origin": "吉林 · 长白山",
+      "latin": "Panax ginseng",
+      "part": "根",
+      "description": "五加科植物人参的干燥根和根茎，具有大补元气、复脉固脱之功效",
+      "conclusion": "正品 · 野生",
+      "spectrum": {
+        "tech": "太赫兹时域光谱 + 拉曼光谱",
+        "test_date": "2024-05-12",
+        "match_rate": "99.1",
+        "grade": "特级",
+        "tags": [
+          "吸收峰 0.55 THz",
+          "吸收峰 1.10 THz",
+          "折射率 1.82",
+          "吸收系数 9.2 cm⁻¹",
+          "特征匹配度 98.1%"
+        ]
+      }
+    },
+    {
+      "code": "008",
+      "name": "三七",
+      "alias": "文山三七",
+      "type": "中草药",
+      "origin": "云南 · 文山",
+      "latin": "Panax notoginseng",
+      "part": "根及根茎",
+      "description": "五加科植物三七的干燥根和根茎，具有散瘀止血、消肿定痛之功效",
+      "conclusion": "正品 · 无掺假",
+      "spectrum": {
+        "tech": "太赫兹时域光谱 + 拉曼光谱",
+        "test_date": "2024-07-02",
+        "match_rate": "96.8",
+        "grade": "一级",
+        "tags": [
+          "吸收峰 0.50 THz",
+          "吸收峰 1.02 THz",
+          "折射率 1.70",
+          "吸收系数 7.8 cm⁻¹",
+          "特征匹配度 94.5%"
+        ]
+      }
+    },
+    {
+      "code": "010",
+      "name": "汤臣倍健蛋白粉",
+      "alias": "汤臣倍健蛋白粉",
+      "type": "保健品",
+      "origin": "广东 · 广州",
+      "latin": "—",
+      "part": "—",
+      "description": "保健食品 · 蛋白粉类，主要成分为乳清蛋白和大豆蛋白",
+      "conclusion": "正品 · 成分达标",
+      "spectrum": {
+        "tech": "太赫兹时域光谱",
+        "test_date": "2024-06-25",
+        "match_rate": "95.3",
+        "grade": "合格",
+        "tags": [
+          "吸收峰 0.45 THz",
+          "折射率 1.55",
+          "吸收系数 5.6 cm⁻¹",
+          "特征匹配度 93.7%"
+        ]
+      }
+    },
+    {
+      "code": "015",
+      "name": "飞鹤星飞帆奶粉",
+      "alias": "飞鹤奶粉",
+      "type": "奶制品",
+      "origin": "黑龙江 · 齐齐哈尔",
+      "latin": "—",
+      "part": "—",
+      "description": "婴幼儿配方奶粉，飞鹤乳业旗下产品",
+      "conclusion": "正品 · 品质优良",
+      "spectrum": {
+        "tech": "太赫兹时域光谱 + 拉曼光谱",
+        "test_date": "2024-07-05",
+        "match_rate": "98.5",
+        "grade": "特级",
+        "tags": [
+          "吸收峰 0.42 THz",
+          "吸收峰 0.88 THz",
+          "折射率 1.48",
+          "吸收系数 4.9 cm⁻¹",
+          "特征匹配度 97.2%"
+        ]
+      }
+    }
+  ]
+}

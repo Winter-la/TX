@@ -1,0 +1,6 @@
+.git
+.idea
+*.iml
+backend/target
+backend/uploads
+uploads

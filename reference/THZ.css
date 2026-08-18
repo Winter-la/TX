@@ -1,0 +1,436 @@
+*{
+    margin:0 auto;
+    padding:0;
+    text-decoration: none;
+}
+header{
+    height: 110px;
+    width: 1600px;
+    /* background-color: red; */
+}
+.wai{
+    height: 110px;
+    width: 750px;
+}
+header a{
+    height: 110px;
+    width: 295px;
+    float: left;
+}
+header a:hover{
+  background-color: yellow;
+}
+
+header .wai .zhineng{
+    float: left;
+    height: 110px;
+    width: 400px;
+    margin-left: 50px;
+    font-size: 45px;
+    line-height: 110px;
+    font-family: "华文楷体";
+    font-weight: bold;
+    color: #000;
+  
+}
+
+#header {
+    width: 1600px;
+    height: 80px;
+    
+}
+.di{
+    width: 100%;
+    height: 80px;
+
+    /* background-color: #323232; */
+    background-color: skyblue;
+}
+#header>div {
+    float: left;
+}
+
+#header .nav_menu {
+    width: 1050px;
+    /* margin-left: 200px; */
+    margin: 0 auto;
+    
+}
+#header .nav_menu dl {
+    float: left;
+    margin-left: 20px;
+    width: 100px;
+    position: relative;
+}
+#header .nav_menu>dl:first-child dt {
+    color: chocolate;
+}
+#header .nav_menu dl>dt {
+    width: 100px;
+    text-align: center;
+    line-height: 80px;
+    cursor: pointer;
+}
+#header .nav_menu dl>dt:hover {
+    color: chocolate;
+}
+/* :first-child :last-child   
+只能找第一个或者最后一个 
+如果第一个或者最后一个不是所需要的元素
+则不会进行操作*/
+/* #header .nav_menu dl div>dd:nth-of-type(1) {
+    margin-top: -5px;
+     设置信息栏上圆角 
+    border-radius: 5px 5px 0 0;
+
+} */
+#header .nav_menu dl>div {
+    background:goldenrod;
+    text-align: center;
+    line-height: 20px;
+    box-shadow:  0px 0px 15px 0px #888888;
+    border-radius: 5px 5px 5px 5px;
+    display: none;
+    position: absolute;
+    top: 60px;
+    left: 20px;
+    z-index: 5;
+}
+
+#header .nav_menu dl:hover div {
+    display: block;
+}
+/* 设置信息栏下圆角 */
+/* #header .nav_menu dl div>dd:last-child {
+    border-radius: 0 0 5px 5px ;
+} */
+#header .nav_menu dl>div dd {
+    cursor: pointer;
+}
+
+#header .nav_menu dl>div dd:hover {
+    background: white;
+}
+
+#header .nav_register {
+    margin-top: 30px;
+    width: 100px;
+    height: 24px;
+    background-color: red;
+    text-align: center;
+    line-height: 24px;
+}
+.nav_menu_middle {
+    display: none;
+}
+
+
+#lbt_tatle {
+    width: 1600px;
+    text-align: center;
+}
+
+
+
+body{
+    padding:20px
+}
+
+/* 最外围div */
+#container{
+    width:600px;
+    height:400px;
+    margin:0 auto;
+    position: relative; /*相对定位 */
+    overflow: hidden;
+}
+
+/*************************** 图片  *******************************/
+/* 包含所有图片的div */
+#list{
+    width:4200px; /* 7张图片的宽 7*600=4200 */
+    height:400px;
+    position:absolute;
+    left:0;  /* 其实轮播图控制的就是绝对定位的left */
+    z-index:1;
+}
+/* 所有的img */
+#list img{
+    float:left  /* 浮在左侧 */
+}
+/************************  小圆点********************************/
+/* 所有的小圆点 */
+#pointDiv{
+    position: absolute;
+    height:10px;
+    width:100px;
+    height:10px;
+    bottom: 20px;
+    left:250px;
+    z-index:2
+}
+
+#pointDiv span{
+    cursor: pointer;
+    float:left;
+    border:1px solid #FFF;
+    width:10px;
+    height:10px;
+    border-radius: 50%;
+    background-color: #333;
+    margin-right:5px
+}
+#pointDiv .on{
+    background-color: orange;
+}
+/****************  左右 **********************************/
+.arrow{
+    cursor: pointer;
+    position:absolute;
+    font-size:36px;
+    text-align: center;
+    line-height:39px;
+    width:40px;
+    height:40px;
+    color:#FFF;
+    background-color: rgba(0, 0, 0,0.3);
+    top:180px;
+    display: none;
+    z-index:2;
+}
+ /* 鼠标放上的时候颜色加深 */
+.arrow:hover{
+    background-color: rgba(0,0,0,0.7);
+}
+/* 鼠标移动到整个区域的时候  */
+#container:hover .arrow{
+    display:block   
+} 
+
+#prev{
+    left:20px;
+}
+#next{
+    right:20px
+}
+
+/* ***************************************************** */
+
+/* ---------------cases---------------- */
+#cases {
+    width: 1600px;
+    height: 0px;
+    background-color: #f0f2f4;
+  }
+  #cases .cases_title {
+    width: 100%;
+    height: 0px;
+    margin-top: 30px;
+  }
+  #cases .cases_title h2 {
+    width: 208px;
+    height: 0px;
+    font-size: 30px;
+    font-family: Microsoft YaHei;
+    font-weight: 300;
+    color: #000000;
+    line-height: 48px;
+  }
+ 
+  #cases .cases_list {
+    width: 100%;
+    height: 0px;
+    /* border: 1px solid; */
+  }
+  #cases .cases_list ul {
+    width: 1200px;
+    height: 0px;
+    margin-left: 210px;
+  }
+  #cases .cases_list ul li {
+    width: 237px;
+    height: 0px;
+    float: left;
+    padding: 30px 30px;
+  }
+  #cases .cases_list ul li span {
+    width: 154px;
+    height: 0px;
+    font-size: 14px;
+    font-family: Microsoft YaHei;
+    font-weight: 300;
+    color: #1c1c1c;
+    line-height: 50px;
+    margin-left: 60px;
+  }
+  #cases .cases_button {
+    width: 1600px;
+    height: 0px;
+    display: inline-block;
+    text-align: center;
+  }
+  #cases .cases_button img {
+    padding: 0 10px;
+  }
+  
+  /* ----------news------------- */
+  #news {
+    width: 1600px;
+    height: 280px;
+    margin-top: 30px;
+    background-color: #f0f2f4;
+  }
+  #news .news_left {
+    height: 100%;
+    width: 580px;
+    /* border: 1px solid; */
+    margin-left: 250px;
+    float: left;
+  }
+  #news .news_left h3 {
+    display: inline-block;
+    width: 580px;
+    height: 25px;
+    font-size: 24px;
+    font-family: Microsoft YaHei;
+    font-weight: 400;
+    color: #000000;
+    line-height: 24px;
+  }
+  #news .news_left h3 span {
+    width: 580px;
+    height: 14px;
+    font-size: 14px;
+    font-family: Microsoft YaHei;
+    font-weight: 400;
+    color: #686868;
+    line-height: 36px;
+  }
+  #news .news_left ul {
+    height: 60px;
+  }
+  #news .news_left ul li {
+    width: 580px;
+    height: 15px;
+    font-size: 14px;
+    font-family: Microsoft YaHei;
+    font-weight: 400;
+    color: blue;
+    line-height: 50px;
+  }
+  #news .news_left ul li p {
+    width: 580px;
+    height: 12px;
+    font-size: 12px;
+    font-family: Microsoft YaHei;
+    font-weight: 400;
+    color: #666666;
+    line-height: 6px;
+  }
+  #news .news_right {
+    width: 600px;
+    height: 75%;
+    border-color: skyblue;
+    border-left: 1px solid #ababab;
+    float: left;
+    padding: 0 40px;
+    margin-top: 36px;
+    margin-left: 35px;
+  }
+  #news .news_right p {
+    margin-bottom: 10px;
+  }
+  #news .news_right h3 {
+    line-height: 50px;
+  }
+  #news .news_right h3 span {
+    font-size: 24px;
+    font-family: Microsoft YaHei;
+    font-weight: 300;
+    color: red;
+  }
+  
+  /* ------------footer---------- */
+  #footer {
+    width: 1600px;
+    height: 230px;
+    background-color: #222222;
+  }
+  #footer .f_footer {
+    width: 1300px;
+    height: 220px;
+    /* background-color: skyblue; */
+  }
+  #footer .f_footer dl {
+    width: 226px;
+    height: 215px;
+    float: left;
+    /* border: 2px solid yellow; */
+    /* position: relative; */
+  }
+  #footer .f_footer dl dt {
+    width: 70px;
+    font-size: 16px;
+    font-family: Microsoft YaHei;
+    font-weight: 400;
+    color: #ffffff;
+    line-height: 70px;
+    margin: 0;
+  }
+  #footer .f_footer dl dd {
+    color: #c8c8c8;
+    width: 70px;
+    height: 30px;
+    line-height: 30px;
+    margin: 0;
+  }
+  /* #footer .f_footer dl img {
+      display: block;
+      position: relative;
+      position: center 100px;
+  } */
+  #footer .f_footer div {
+    float: left;
+    width: 175px;
+    height: 215px;
+    position: relative;
+  }
+  #footer .f_footer div img {
+    position: relative;
+    /* position: center center; */
+    margin-top: 80px;
+    margin-left: 50px;
+  }
+  #footer .f_footer .f_second {
+    margin-left: 60px;
+  }
+  #footer .f_footer .f_third {
+      width: 226px;
+      height: 215px;
+      float: left;
+  }
+  #footer .f_footer .f_third dt {
+    font-size: 16px;
+    font-family: Microsoft YaHei;
+    font-weight: 300;
+    color: #ff0000;
+    line-height: 70px;
+  }
+  #footer .f_footer .f_third dd {
+      background-image: url("../imgs/phone.png");
+      background-repeat: no-repeat;
+      background-position: 0 center;
+      padding-left: 20px;
+  }
+  
+  /* --------------last---------- */
+  #last {
+      width: 1600px;
+      height: 45px;
+      background-color: #101010;
+  }
+  #last p {
+      color: white;
+      display: block;
+      text-align: center;
+  }

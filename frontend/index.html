@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>驻马店区域内中药材质量安全追溯体系信息平台</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg-overlay"></div>
+
+<header class="site-header">
+    <div class="header-content">
+        <div class="logo-wrap">
+            <img src="images/tu/0黄淮学院校徽.png" alt="黄淮学院校徽" class="logo-img">
+            <div class="title-wrap">
+                <h1 class="site-title">驻马店区域内中药材质量安全追溯体系信息平台</h1>
+                <p class="site-subtitle">Zhumadian Traditional Chinese Medicine Quality Safety Traceability System Information Platform</p>
+            </div>
+        </div>
+        <div class="header-login" id="headerLogin">
+            <button class="btn-login" onclick="openMemberLogin()" id="btnLoginText">&#x1f464; 登录</button>
+            <span id="userInfo" style="display:none;color:#4a3a1f;font-size:14px">
+                &#x1f464; <span id="userNameDisp"></span>
+                <button class="btn-logout" onclick="doLogout()" style="margin-left:10px;background:none;border:1px solid #8a6d3b;color:#8a6d3b;padding:4px 12px;border-radius:4px;cursor:pointer">退出</button>
+            </span>
+        </div>
+    </div>
+</header>
+
+<!-- ===== 主内容区：左侧功能卡片 + 右侧查询面板 ===== -->
+<main class="home-main">
+    <!-- 左侧：彩色功能方块 -->
+    <div class="home-left">
+        <h2 class="home-title">平台功能</h2>
+        <div class="card-grid">
+            <a href="herbs.html" class="func-card card-green">
+                <span class="card-icon">&#x1f33f;</span>
+                <span class="card-label">药材种类</span>
+            </a>
+            <a href="javascript:void(0)" class="func-card card-blue" onclick="checkDownloadAccess()">
+                <span class="card-icon">&#x1f4e5;</span>
+                <span class="card-label">数据下载</span>
+            </a>
+            <a href="about.html" class="func-card card-purple">
+                <span class="card-icon">&#x2139;&#xfe0f;</span>
+                <span class="card-label">平台介绍</span>
+            </a>
+            <a href="policy.html" class="func-card card-orange">
+                <span class="card-icon">&#x1f4f0;</span>
+                <span class="card-label">新闻政策公告</span>
+            </a>
+            <a href="javascript:void(0)" onclick="openAdminLogin()" class="func-card card-red">
+                <span class="card-icon">&#x1f4c1;</span>
+                <span class="card-label">数据上传</span>
+            </a>
+            <a href="trace.html" class="func-card card-teal">
+                <span class="card-icon">&#x1f50d;</span>
+                <span class="card-label">追溯码查询</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 右侧：查询面板 -->
+    <div class="home-right">
+        <div class="query-panel">
+            <h2 class="query-title">产品码查询</h2>
+            <p class="query-desc">输入产品码，查询中药材质量安全溯源信息</p>
+            <div class="trace-input-wrap">
+                <input type="text" id="traceCodeInput" placeholder="请输入产品码查询" maxlength="12" readonly>
+                <button id="searchBtn" class="search-btn" onclick="searchTrace()">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="7"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="keypad" id="keypad">
+                <button class="key" data-num="1">1</button>
+                <button class="key" data-num="2">2</button>
+                <button class="key" data-num="3">3</button>
+                <button class="key" data-num="4">4</button>
+                <button class="key" data-num="5">5</button>
+                <button class="key" data-num="6">6</button>
+                <button class="key" data-num="7">7</button>
+                <button class="key" data-num="8">8</button>
+                <button class="key" data-num="9">9</button>
+                <button class="key key-clear" id="keyClear">X</button>
+                <button class="key" data-num="0">0</button>
+                <button class="key key-back" id="keyBack">&#x2190;</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- ===== 追溯结果展示区 ===== -->
+<section class="result-section">
+    <div class="trace-result" id="traceResult">
+        <div class="result-header">
+            <h3 id="resultTitle">产品名称：</h3>
+            <span class="status">&#x2705; 已认证</span>
+        </div>
+        <div class="result-grid">
+            <div class="item"><span class="label">追溯码</span><span class="value" id="rCode">—</span></div>
+            <div class="item"><span class="label">产品类型</span><span class="value" id="rType">—</span></div>
+            <div class="item"><span class="label">产地</span><span class="value" id="rOrigin">—</span></div>
+            <div class="item"><span class="label">拉丁学名</span><span class="value" id="rLatin">—</span></div>
+            <div class="item"><span class="label">药用部位</span><span class="value" id="rPart">—</span></div>
+            <div class="item"><span class="label">鉴定结论</span><span class="value" id="rConclusion">—</span></div>
+        </div>
+        <div class="result-grid" id="productDescRow" style="display:none;">
+            <div class="item" style="grid-column:1/-1;"><span class="label">产品简介</span><span class="value" id="rDesc"></span></div>
+        </div>
+        <div style="text-align:center;margin:18px 0 8px;">
+            <button id="showDetailBtn" class="btn-detail" onclick="toggleDetail()">&#x1f50d; 查看完整数据</button>
+        </div>
+        <div id="detailSection" style="display:none;">
+            <div class="detail-divider">&#x1f4ca; 检测信息</div>
+            <div class="result-grid">
+                <div class="item"><span class="label">检测技术</span><span class="value" id="rTech">—</span></div>
+                <div class="item"><span class="label">检测日期</span><span class="value" id="rDate">—</span></div>
+                <div class="item"><span class="label">匹配度 (%)</span><span class="value" id="rMatch">—</span></div>
+                <div class="item"><span class="label">质量等级</span><span class="value" id="rGrade">—</span></div>
+            </div>
+            <div class="result-charts" id="spectrumImages">
+                <div class="chart-box">
+                    <h4 class="chart-title">&#x1f4f7; 时域光谱图</h4>
+                    <div class="chart-placeholder" id="placeholderTime">
+                        <img id="imgTimeDomain" src="" style="width:100%;border-radius:6px;display:none;" alt="时域光谱图">
+                        <p class="no-image" id="noImgTime">&#x1f6ab; 暂无</p>
+                    </div>
+                    <p class="image-desc" id="descTime" style="display:none;"></p>
+                </div>
+                <div class="chart-box">
+                    <h4 class="chart-title">&#x1f4f7; 频域光谱图</h4>
+                    <div class="chart-placeholder" id="placeholderFreq">
+                        <img id="imgFrequency" src="" style="width:100%;border-radius:6px;display:none;" alt="频域光谱图">
+                        <p class="no-image" id="noImgFreq">&#x1f6ab; 暂无</p>
+                    </div>
+                    <p class="image-desc" id="descFreq" style="display:none;"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="site-footer">
+    <p>黄淮学院 · 驻马店区域内中药材质量安全追溯体系信息平台</p>
+    <p>&copy; 2026 智能指纹图谱技术 &nbsp;|&nbsp; 太赫兹光谱追溯</p>
+    <p><a class="footer-feedback" href="feedback.html" target="_blank" rel="noopener">&#x1f4ac; 提出意见</a></p>
+</footer>
+
+<div id="memberLoginModal" class="admin-modal-mask" style="display:none" onclick="closeMemberLogin()">
+  <div class="admin-modal" onclick="event.stopPropagation()">
+    <button class="admin-modal-close" onclick="closeMemberLogin()" title="关闭">&times;</button>
+    <h3 class="admin-modal-title">&#x1f512; 会员登录</h3>
+    <p style="font-size:12px;color:#999;margin-bottom:10px;">登录后可使用数据下载等功能</p>
+    <input type="text" id="memberLoginUser" placeholder="用户名">
+    <input type="password" id="memberLoginPwd" placeholder="密码" onkeydown="if(event.key==='Enter')memberLogin()">
+    <button class="admin-modal-btn" onclick="memberLogin()">登 录</button>
+    <p class="admin-modal-error" id="memberLoginError"></p>
+  </div>
+</div>
+<div id="adminLoginModal" class="admin-modal-mask" style="display:none" onclick="closeAdminLogin()">
+  <div class="admin-modal" onclick="event.stopPropagation()">
+    <button class="admin-modal-close" onclick="closeAdminLogin()" title="关闭">&times;</button>
+    <h3 class="admin-modal-title">&#x1f512; 数据上传系统登录</h3>
+    <p style="font-size:12px;color:#999;margin-bottom:10px;">仅管理员可访问</p>
+    <input type="text" id="adminLoginUser" placeholder="管理员用户名" value="admin">
+    <input type="password" id="adminLoginPwd" placeholder="密码" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="admin-modal-btn" onclick="adminLogin()">登 录</button>
+    <p class="admin-modal-error" id="adminLoginError"></p>
+  </div>
+</div>
+<script src="js/config.js"></script>
+<script src="js/vendor/jquery.min.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>平台介绍 - 驻马店区域内中药材质量安全追溯体系信息平台</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg-overlay"></div>
+
+<header class="site-header">
+    <div class="header-content">
+        <div class="logo-wrap">
+            <img src="images/tu/0黄淮学院校徽.png" alt="黄淮学院校徽" class="logo-img">
+            <div class="title-wrap">
+                <h1 class="site-title">驻马店区域内中药材质量安全追溯体系信息平台</h1>
+                <p class="site-subtitle">Zhumadian Traditional Chinese Medicine Quality Safety Traceability System Information Platform</p>
+            </div>
+        </div>
+    </div>
+                <nav class="main-nav">
+        <a href="index.html">首页</a>
+        <a href="herbs.html">药材种类</a>
+        <a href="download.html">数据下载</a>
+        <a href="about.html" class="active">平台介绍</a>
+        <a href="policy.html">新闻政策公告</a>
+        <a href="javascript:void(0)" onclick="openAdminLogin()">数据上传</a>
+    </nav>
+</header>
+
+<main class="page-main">
+    <div class="content-section">
+        <h2 class="section-title">平台介绍</h2>
+        <p class="section-text">
+            本平台依托太赫兹时域光谱与拉曼光谱技术，构建驻马店区域内中药材质量安全追溯体系，
+            实现中药材从种植、加工到流通全过程的产地溯源、真伪鉴别与质量监控。
+        </p>
+    </div>
+
+    <div class="content-section">
+        <h2 class="section-title">核心功能</h2>
+        <div class="feature-grid">
+            <div class="feature-item">
+                <h3>太赫兹光谱分析</h3>
+                <p>利用太赫兹时域光谱技术获取药材独特的指纹图谱，实现高精度成分鉴定。</p>
+            </div>
+            <div class="feature-item">
+                <h3>追溯码溯源</h3>
+                <p>每件产品赋予唯一追溯码，扫码即可追溯产地、加工、检测全流程信息。</p>
+            </div>
+            <div class="feature-item">
+                <h3>质量安全监控</h3>
+                <p>无接触检测手段，为药材真伪鉴别提供科学依据，守护大众健康。</p>
+            </div>
+            <div class="feature-item">
+                <h3>大数据平台</h3>
+                <p>建立中药材太赫兹光谱大数据库，支持智能比对与检索。</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-section">
+        <h2 class="section-title">技术原理</h2>
+        <p class="section-text">
+            太赫兹波（0.1-10 THz）对物质内部的分子振动、晶格振动等具有独特的指纹响应，
+            不同中药材在太赫兹波段的吸收光谱差异显著，可用于快速鉴别药材真伪与产地溯源。
+            结合拉曼光谱技术，可从分子层面提供补充验证信息，双重确保鉴定结果准确可靠。
+        </p>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <p>黄淮学院 · 驻马店区域内中药材质量安全追溯体系信息平台</p>
+    <p>&copy; 2026 智能指纹图谱技术 &nbsp;|&nbsp; 太赫兹光谱追溯</p>
+</footer>
+
+<!-- Admin 登录模态框（内联） -->
+<div id="adminLoginModal" class="admin-modal-mask" style="display:none" onclick="closeAdminLogin()">
+  <div class="admin-modal" onclick="event.stopPropagation()">
+    <button class="admin-modal-close" onclick="closeAdminLogin()" title="关闭">&times;</button>
+    <h3 class="admin-modal-title">Admin 系统登录</h3>
+    <input type="text" id="adminLoginUser" placeholder="用户名" value="admin">
+    <input type="password" id="adminLoginPwd" placeholder="密码" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="admin-modal-btn" onclick="adminLogin()">登 录</button>
+    <p class="admin-modal-error" id="adminLoginError"></p>
+  </div>
+</div>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+
+</body>
+</html>

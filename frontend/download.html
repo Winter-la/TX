@@ -1,0 +1,254 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据下载 - 驻马店区域内中药材质量安全追溯体系信息平台</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg-overlay"></div>
+
+<header class="site-header">
+    <div class="header-content">
+        <div class="logo-wrap">
+            <img src="images/tu/0黄淮学院校徽.png" alt="黄淮学院校徽" class="logo-img">
+            <div class="title-wrap">
+                <h1 class="site-title">驻马店区域内中药材质量安全追溯体系信息平台</h1>
+                <p class="site-subtitle">Zhumadian Traditional Chinese Medicine Quality Safety Traceability System Information Platform</p>
+            </div>
+        </div>
+    </div>
+    <nav class="main-nav">
+        <a href="index.html">首页</a>
+        <a href="herbs.html">药材种类</a>
+        <a href="download.html" class="active">数据下载</a>
+        <a href="about.html">平台介绍</a>
+        <a href="policy.html">新闻政策公告</a>
+        <a href="javascript:void(0)" onclick="openAdminLogin()">数据上传</a>
+    </nav>
+</header>
+
+<main class="page-main">
+    <div class="content-section">
+        <h2 class="section-title">数据下载</h2>
+        <p class="section-text" style="margin-bottom:14px;">光谱源文件（.txt）下载列表，按产品维度展示时域和频域数据文件状态</p>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead>
+                <tr style="border-bottom:2px solid #8a6d3b;">
+                    <th style="padding:8px 6px;text-align:left;">追溯码</th>
+                    <th style="padding:8px 6px;text-align:left;">产品名称</th>
+                    <th style="padding:8px 6px;text-align:center;">类型</th>
+                    <th style="padding:8px 6px;text-align:center;">时域文件</th>
+                    <th style="padding:8px 6px;text-align:center;">频域文件</th>
+                    <th style="padding:8px 6px;text-align:center;">操作</th>
+                </tr>
+            </thead>
+            <tbody id="fileList"><tr><td colspan="6" style="text-align:center;color:#999;padding:20px;">加载中...</td></tr></tbody>
+        </table>
+    </div>
+</main>
+
+<div id="previewModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:12px;padding:24px;width:750px;max-width:95vw;max-height:85vh;overflow-y:auto;position:relative;">
+        <button onclick="closePreview()" style="position:absolute;top:10px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:#999;">&times;</button>
+        <h3 style="color:#4a3a1f;margin-bottom:16px;" id="previewTitle">光谱预览</h3>
+        <canvas id="previewChart" width="680" height="320"></canvas>
+        <p style="text-align:center;color:#999;margin-top:8px;font-size:12px;" id="previewInfo"></p>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <p>黄淮学院 · 驻马店区域内中药材质量安全追溯体系信息平台</p>
+    <p>&copy; 2026 智能指纹图谱技术 &nbsp;|&nbsp; 太赫兹光谱追溯</p>
+</footer>
+
+<script src="js/vendor/chart.umd.min.js"></script>
+
+<!-- 管理登录弹窗 -->
+<div id="adminLoginModal" class="admin-modal-mask" style="display:none" onclick="closeAdminLogin()">
+  <div class="admin-modal" onclick="event.stopPropagation()">
+    <button class="admin-modal-close" onclick="closeAdminLogin()" title="关闭">&times;</button>
+    <h3 class="admin-modal-title">Admin 系统登录</h3>
+    <input type="text" id="adminLoginUser" placeholder="用户名" value="admin">
+    <input type="password" id="adminLoginPwd" placeholder="密码" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="admin-modal-btn" onclick="adminLogin()">登 录</button>
+    <p class="admin-modal-error" id="adminLoginError"></p>
+  </div>
+</div>
+
+<!-- 会员登录弹窗（下载页专用，登录后留在当前页） -->
+<div id="memberLoginModal" class="admin-modal-mask" style="display:none" onclick="closeMemberLogin()">
+  <div class="admin-modal" onclick="event.stopPropagation()">
+    <button class="admin-modal-close" onclick="closeMemberLogin()" title="关闭">&times;</button>
+    <h3 class="admin-modal-title">&#x1f512; 登录</h3>
+    <p style="font-size:12px;color:#999;margin-bottom:10px;">会员或管理员登录后可下载数据</p>
+    <input type="text" id="memberLoginUser" placeholder="用户名">
+    <input type="password" id="memberLoginPwd" placeholder="密码" onkeydown="if(event.key==='Enter')memberLogin()">
+    <button class="admin-modal-btn" onclick="memberLogin(loadList)">登 录</button>
+    <p class="admin-modal-error" id="memberLoginError"></p>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/vendor/jquery.min.js"></script>
+
+<!-- ===== 脚本：下载列表 + 预览 + 下载 ===== -->
+<script>
+function esc(s) {
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+}
+function formatSize(b) {
+    if (b > 1048576) { return (b / 1048576).toFixed(1) + ' MB'; }
+    return (b / 1024).toFixed(1) + ' KB';
+}
+
+/* ---------- 加载数据列表 ---------- */
+function loadList() {
+    var token = localStorage.getItem('adminToken');
+    if (!token) {
+        document.getElementById('fileList').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e53935;">请先<a href="javascript:void(0)" onclick="openMemberLogin()" style="color:#8a6d3b;text-decoration:underline">登录</a>后查看数据下载</td></tr>';
+        return;
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', apiUrl('/api/spectrum/list'), true);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+    xhr.onload = function () {
+        if (xhr.status === 401 || xhr.status === 403) {
+            document.getElementById('fileList').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e53935;">登录已过期，请<a href="javascript:void(0)" onclick="openMemberLogin()" style="color:#8a6d3b;text-decoration:underline">重新登录</a></td></tr>';
+            return;
+        }
+        if (xhr.status !== 200) {
+            document.getElementById('fileList').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e53935;">服务器错误(' + xhr.status + ')</td></tr>';
+            return;
+        }
+        try {
+            var products = JSON.parse(xhr.responseText);
+            if (!Array.isArray(products)) {
+                document.getElementById('fileList').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e53935;">数据格式异常</td></tr>';
+                return;
+            }
+            var h = '';
+            for (var i = 0; i < products.length; i++) {
+                var p = products[i];
+                var time = p.timeFile;
+                var freq = p.freqFile;
+                var th = (time && time.hasFile) ? ('<span style="color:#27ae60;">' + formatSize(time.fileSize) + '</span>') : '<span style="color:#e53935;">未上传</span>';
+                var fh = (freq && freq.hasFile) ? ('<span style="color:#27ae60;">' + formatSize(freq.fileSize) + '</span>') : '<span style="color:#e53935;">未上传</span>';
+                var act = '';
+                if (time && time.hasFile) {
+                    var tid = String(time.id).replace(/'/g, "\\'");
+                    act += '<a href="#" onclick="downloadFile(\'' + tid + '\');return false" style="font-size:11px;padding:4px 10px;background:#8a6d3b;color:#fff;border-radius:6px;text-decoration:none;margin-right:4px;">下载时域</a>';
+                    act += ' <button onclick="previewSpectrum(\'' + tid + '\')" style="font-size:11px;padding:4px 10px;background:#6f5730;color:#fff;border:none;border-radius:6px;cursor:pointer;margin-right:4px;">预览时域</button>';
+                }
+                if (freq && freq.hasFile) {
+                    var fid = String(freq.id).replace(/'/g, "\\'");
+                    act += '<a href="#" onclick="downloadFile(\'' + fid + '\');return false" style="font-size:11px;padding:4px 10px;background:#8a6d3b;color:#fff;border-radius:6px;text-decoration:none;margin-right:4px;">下载频域</a>';
+                    act += ' <button onclick="previewSpectrum(\'' + fid + '\')" style="font-size:11px;padding:4px 10px;background:#6f5730;color:#fff;border:none;border-radius:6px;cursor:pointer;">预览频域</button>';
+                }
+                if (!act) { act = '<span style="color:#999;font-size:11px;">暂无文件</span>'; }
+                h += '<tr>' +
+                    '<td style="padding:8px 6px;text-align:left;"><strong>' + esc(p.code) + '</strong></td>' +
+                    '<td style="padding:8px 6px;text-align:left;">' + esc(p.name) + '</td>' +
+                    '<td style="padding:8px 6px;text-align:center;"><span style="background:#f5efe3;color:#8a6d3b;padding:2px 8px;border-radius:10px;font-size:11px;">' + esc(p.type) + '</span></td>' +
+                    '<td style="padding:8px 6px;text-align:center;">' + th + '</td>' +
+                    '<td style="padding:8px 6px;text-align:center;">' + fh + '</td>' +
+                    '<td style="padding:8px 6px;text-align:center;">' + act + '</td>' +
+                    '</tr>';
+            }
+            document.getElementById('fileList').innerHTML = h || '<tr><td colspan="6" style="text-align:center;color:#999;">暂无数据</td></tr>';
+        } catch (e) {
+            document.getElementById('fileList').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e53935;">渲染出错: ' + e.message + '</td></tr>';
+        }
+    };
+    xhr.onerror = function () {
+        document.getElementById('fileList').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e53935;">无法连接后端服务器</td></tr>';
+    };
+    xhr.send();
+}
+
+/* ---------- 下载文件 ---------- */
+function downloadFile(id) {
+    var token = localStorage.getItem('adminToken') || '';
+    fetch(apiUrl('/api/spectrum/download?id=' + encodeURIComponent(id)), {
+        headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function (r) {
+        if (!r.ok) { throw new Error('下载失败(' + r.status + ')'); }
+        return r.blob();
+    }).then(function (b) {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = 'spectrum_' + id + '.txt';
+        a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    }).catch(function (e) {
+        alert(e.message);
+    });
+}
+
+/* ---------- 预览光谱 ---------- */
+var previewChart = null;
+function previewSpectrum(id) {
+    var token = localStorage.getItem('adminToken') || '';
+    $.ajax({
+        url: apiUrl('/api/spectrum/preview?id=' + encodeURIComponent(id)),
+        headers: { 'Authorization': 'Bearer ' + token },
+        success: function (d) {
+            if (d.error) { alert(d.error); return; }
+            if (!Array.isArray(d.data) || d.data.length === 0) { alert('无光谱数据'); return; }
+            $('#previewTitle').text((d.dataType || '') + '光谱');
+            $('#previewInfo').text('数据点: ' + d.pointCount + ' | ' + d.originalName);
+            $('#previewModal').css('display', 'flex');
+            var labels = d.data.map(function (p) { return p[0].toFixed(3); });
+            var values = d.data.map(function (p) { return p[1]; });
+            var ctx = document.getElementById('previewChart').getContext('2d');
+            if (previewChart) { previewChart.destroy(); }
+            previewChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: d.dataType || '',
+                        data: values,
+                        borderColor: '#8a6d3b',
+                        backgroundColor: 'rgba(138,109,59,0.06)',
+                        borderWidth: 1.5,
+                        pointRadius: 0,
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: {
+                            title: { display: true, text: d.dataType === '频域' ? '频率 (THz)' : '波长 (nm)', color: '#888' },
+                            grid: { display: false },
+                            ticks: { font: { size: 10 }, maxTicksLimit: 12 }
+                        },
+                        y: {
+                            title: { display: true, text: '强度 (a.u.)', color: '#888' },
+                            grid: { color: '#eee' },
+                            ticks: { font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        },
+        error: function () {
+            alert('预览数据加载失败');
+        }
+    });
+}
+function closePreview() {
+    document.getElementById('previewModal').style.display = 'none';
+}
+
+$(function () { loadList(); });
+</script>
+</body>
+</html>

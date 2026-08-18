@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轮播图</title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            text-decoration: none;
+        }
+        body{
+            padding:20px
+        }
+
+        /* 最外围div */
+        #container{
+            width:600px;
+            height:400px;
+            margin:0 auto;
+            position: relative; /*相对定位 */
+            overflow: hidden;
+        }
+
+        /*************************** 图片  *******************************/
+        /* 包含所有图片的div */
+        #list{
+            width:4200px; /* 7张图片的宽 7*600=4200 */
+            height:400px;
+            position:absolute;
+            left:0;  /* 其实轮播图控制的就是绝对定位的left */
+            z-index:1;
+        }
+        /* 所有的img */
+        #list img{
+            float:left  /* 浮在左侧 */
+        }
+        /************************  小圆点********************************/
+        /* 所有的小圆点 */
+        #pointDiv{
+            position: absolute;
+            height:10px;
+            width:100px;
+            height:10px;
+            bottom: 20px;
+            left:250px;
+            z-index:2
+        }
+
+        #pointDiv span{
+            cursor: pointer;
+            float:left;
+            border:1px solid #FFF;
+            width:10px;
+            height:10px;
+            border-radius: 50%;
+            background-color: #333;
+            margin-right:5px
+        }
+        #pointDiv .on{
+            background-color: orange;
+        }
+        /****************  左右 **********************************/
+        .arrow{
+            cursor: pointer;
+            position:absolute;
+            font-size:36px;
+            text-align: center;
+            line-height:39px;
+            width:40px;
+            height:40px;
+            color:#FFF;
+            background-color: rgba(0, 0, 0,0.3);
+            top:180px;
+            display: none;
+            z-index:2;
+        }
+         /* 鼠标放上的时候颜色加深 */
+        .arrow:hover{
+            background-color: rgba(0,0,0,0.7);
+        }
+        /* 鼠标移动到整个区域的时候  */
+        #container:hover .arrow{
+            display:block   
+        } 
+
+        #prev{
+            left:20px;
+        }
+        #next{
+            right:20px
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="list" style="left:-600px">
+            <img src="img/5.jpg"  alt="5" />
+            <img src="img/1.jpg"  alt="1" />
+            <img src="img/2.jpg"  alt="2"/>
+            <img src="img/3.jpg"  alt="3"/>
+            <img src="img/4.jpg"  alt="4"/>
+            <img src="img/5.jpg"  alt="5"/>
+            <img src="img/1.jpg"  alt="1"/>
+        </div>
+
+        <div id="pointDiv">
+            <span index="1" class="on"></span>
+            <span index="2"></span>
+            <span index="3"></span>
+            <span index="4"></span>
+            <span index="5"></span>
+        </div>
+
+        <!-- a标签会产生跳转
+            1 阻止事件默认提交
+            2 直接在a标签中加javascript:;
+        -->
+        <a href="javascript:;" id="prev" class="arrow">&lt;</a>
+        <a href="javascript:;" id="next" class="arrow">&gt;</a>
+        
+    </div>
+</body>
+<script src="js/jquery-1.10.1.js"></script>
+<script>
+/*
+功能:
+  1 点击向右(左) 平滑的切到下(上)一页
+  2 无限循环切换
+  3 每个3s自动翻到下一页
+  4 鼠标进入停止自动翻页 移出开启自动翻页
+  5 切换页面的时候 下边的圆点也更新
+  6 点击圆点图标自动切换
+  7 动画执行过程中不能重复执行nextPage方法   
+*/ 
+$(function(){
+    //显示区域容器
+    var $container = $("#container")
+    //图片容器
+    var $list      = $("#list")
+    //小圆点
+    var $points    = $("#pointDiv span")
+    //左右按钮
+    var $next      = $("#next")
+    var $prev      = $("#prev")
+
+    //动画总时长
+    var time = 3000
+    //每一帧的动画时长
+    var itemTime=60
+    //图片宽度
+    var img_width=600
+    //获取小圆点的个数
+    var img_num= $points.length
+    //定义标识变量 用于记录index
+    var index=0
+    //定义标识 用于记录动画是否还在执行中 防止用户反复点击造成 动画重复运行
+    var isMoving =false
+
+    //2,3 每隔3s自动切换
+    var autoInterval = setInterval(function(){
+       nextPage(true)
+    },3000)
+
+    //4 鼠标进入停止自动翻页 
+    $container.hover(function(){
+        console.log(11111111111111111111)
+        clearInterval(autoInterval)
+    },function(){
+        console.log(2222222222222222222)
+        autoInterval=setInterval(function(){
+            nextPage(true)
+        },3000)
+    })
+
+    //5点击小圆点 图标切换到对应的页码
+    $points.click(function(){
+        var targetIndex = $(this).index() //
+        //点击当前小圆点 直接返回
+        if(targetIndex==index){
+            return 
+        }
+        //针对小圆点传递的是整型数据
+        nextPage(targetIndex)
+    })
+
+    //向左移动
+    $next.click(function(){
+        nextPage(true)
+    })
+    //向右移动
+    $prev.click(function(){
+        nextPage(false)
+    })
+    function nextPage(next){
+        //判断当前动画是否在移动中
+        if(isMoving){
+            return
+        }
+        isMoving=true
+        //拿到当前$list左侧的距离
+        var currLeft  = $list.position().left;  //0 -2400
+       
+        if(typeof next==='boolean'){
+             //向右移动
+            var offset = next ? -img_width:img_width
+        }else{
+            //传递小圆点的数据
+            var offset= -(next-index)*img_width
+        }
+        
+        //当前目标
+        var targetLeft= currLeft + offset   //-600
+        //console.log(currLeft)  //0 -12  ...  -600
+        //计算每一步的步长 在3000毫秒内 每一步走60毫秒 总长度是600
+        var itemOffset = offset/(time/itemTime)
+        //定时器
+        var timer = setInterval(function(){
+             currLeft +=itemOffset  
+             if(currLeft===targetLeft){
+                 console.log(currLeft)
+                 //到达0的位置也就是第一张 再往左移动就要到最后一张图了
+                 if(currLeft===0){
+                     //console.log(img_num,img_width)
+                     currLeft = -(img_num*img_width)  //到最后一张
+                     //console.log(currLeft+"+++++++++++++++++")
+                 //到达最后一张图 再向右移动就要重新回到第一张图片
+                 }else if(currLeft==-(img_num+1)*img_width){
+                     currLeft = -img_width   //到最后一张的时候应该要到第一张
+                 }
+                 isMoving = false
+                 clearInterval(timer)  //到600那个位置了就停了
+             }
+             $list.css("left",currLeft)
+        },itemTime)
+        //$list.css("left","-600px")
+        update(next) //更新底部按钮
+    }
+
+    function update(next){
+        // 6>5
+        if(typeof next==="boolean"){
+            var targetIndex = next ? index+1:index-1
+        }else{
+            var targetIndex = next
+        }
+
+        if(targetIndex<0){
+            targetIndex = img_num-1  //回到最后一张图片
+        }else if(targetIndex>img_num-1){
+            targetIndex = 0   //回到第一页
+        }
+
+        $points.eq(targetIndex).addClass("on")  //将现在的变成橘黄色
+        $points.eq(index).removeClass("on")  //将以前的那个选中移出
+        index = targetIndex  //现在的就变成以前的
+    }
+})
+</script>
+</html>

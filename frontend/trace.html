@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>追溯码查询 - 驻马店区域内中药材质量安全追溯体系信息平台</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg-overlay"></div>
+
+<header class="site-header">
+    <div class="header-content">
+        <div class="logo-wrap">
+            <img src="images/tu/0黄淮学院校徽.png" alt="黄淮学院校徽" class="logo-img">
+            <div class="title-wrap">
+                <h1 class="site-title">驻马店区域内中药材质量安全追溯体系信息平台</h1>
+                <p class="site-subtitle">Zhumadian Traditional Chinese Medicine Quality Safety Traceability System Information Platform</p>
+            </div>
+        </div>
+    </div>
+    <nav class="main-nav">
+        <a href="index.html">首页</a>
+        <a href="herbs.html">药材种类</a>
+        <a href="download.html">数据下载</a>
+        <a href="about.html">平台介绍</a>
+        <a href="policy.html">新闻政策公告</a>
+        <a href="trace.html" class="active">追溯码查询</a>
+        <a href="javascript:void(0)" onclick="openAdminLogin()">数据上传</a>
+    </nav>
+</header>
+
+<main class="page-main">
+    <div class="content-section">
+        <h2 class="section-title">追溯码查询</h2>
+        <div style="display:flex;gap:12px;margin-top:16px;max-width:500px">
+            <input type="text" id="traceInput" placeholder="请输入追溯码" style="flex:1;padding:12px 16px;border:2px solid #d8cdb8;border-radius:8px;font-size:16px;outline:none">
+            <button onclick="searchTrace()" style="background:#8a6d3b;color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:16px;cursor:pointer;font-weight:600">查询</button>
+        </div>
+        <div id="traceResult" style="margin-top:20px"></div>
+    </div>
+</main>
+
+<footer class="site-footer">
+    <p>黄淮学院 · 驻马店区域内中药材质量安全追溯体系信息平台</p>
+    <p>&copy; 2026 智能指纹图谱技术 &nbsp;|&nbsp; 太赫兹光谱追溯</p>
+</footer>
+
+<div id="adminLoginModal" class="admin-modal-mask" style="display:none" onclick="closeAdminLogin()">
+  <div class="admin-modal" onclick="event.stopPropagation()">
+    <button class="admin-modal-close" onclick="closeAdminLogin()" title="关闭">&times;</button>
+    <h3 class="admin-modal-title">Admin 系统登录</h3>
+    <input type="text" id="adminLoginUser" placeholder="用户名" value="admin">
+    <input type="password" id="adminLoginPwd" placeholder="密码" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="admin-modal-btn" onclick="adminLogin()">登 录</button>
+    <p class="admin-modal-error" id="adminLoginError"></p>
+  </div>
+</div>
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/vendor/jquery.min.js"></script>
+<script>
+function searchTrace(){
+    var code = $('#traceInput').val().trim();
+    if (!code) { alert('请输入追溯码'); return; }
+    $.ajax({
+        url: apiUrl('/api/trace/query?code='+encodeURIComponent(code)),
+        success: function(d){
+        if (!d.found) {
+            $('#traceResult').html('<p style="color:#e53935;text-align:center;padding:20px">'+esc(d.message||'未找到该追溯码对应的流通记录')+'</p>');
+            return;
+        }
+        var h = '';
+        if (d.product) {
+            h += '<table style="width:100%;font-size:13px;border-collapse:collapse;margin-bottom:18px"><thead><tr><th colspan="2" style="text-align:left;padding:8px;border-bottom:2px solid #8a6d3b;color:#4a3a1f">产品信息</th></tr></thead><tbody>';
+            h += '<tr><td style="padding:8px;border-bottom:1px solid #eee;color:#888;width:100px">产品码</td><td style="padding:8px;border-bottom:1px solid #eee">'+esc(d.product.code)+'</td></tr>';
+            h += '<tr><td style="padding:8px;border-bottom:1px solid #eee;color:#888">名称</td><td style="padding:8px;border-bottom:1px solid #eee">'+esc(d.product.name)+'</td></tr>';
+            h += '<tr><td style="padding:8px;border-bottom:1px solid #eee;color:#888">类型</td><td style="padding:8px;border-bottom:1px solid #eee">'+esc(d.product.type)+'</td></tr>';
+            h += '<tr><td style="padding:8px;border-bottom:1px solid #eee;color:#888">产地</td><td style="padding:8px;border-bottom:1px solid #eee">'+esc(d.product.origin||'—')+'</td></tr>';
+            h += '</tbody></table>';
+        }
+        if (d.flows && d.flows.length > 0) {
+            h += '<h4 style="color:#4a3a1f;margin-bottom:10px">流向记录 ('+d.flows.length+'条)</h4>';
+            h += '<table style="width:100%;font-size:13px;border-collapse:collapse;table-layout:fixed"><thead><tr><th style="text-align:left;padding:8px;border-bottom:2px solid #8a6d3b;color:#4a3a1f">追溯码</th><th style="text-align:left;padding:8px;border-bottom:2px solid #8a6d3b;color:#4a3a1f">购买者</th><th style="text-align:left;padding:8px;border-bottom:2px solid #8a6d3b;color:#4a3a1f">电话</th><th style="text-align:left;padding:8px;border-bottom:2px solid #8a6d3b;color:#4a3a1f">地址</th><th style="text-align:left;padding:8px;border-bottom:2px solid #8a6d3b;color:#4a3a1f">销售时间</th></tr></thead><tbody>';
+            d.flows.forEach(function(f){
+                h += '<tr><td style="padding:8px;border-bottom:1px solid #eee">'+esc(f.traceCode)+'</td><td style="padding:8px;border-bottom:1px solid #eee">'+esc(f.buyerName)+'</td><td style="padding:8px;border-bottom:1px solid #eee">'+esc(f.buyerPhone)+'</td><td style="padding:8px;border-bottom:1px solid #eee">'+esc(f.buyerAddress||'—')+'</td><td style="padding:8px;border-bottom:1px solid #eee">'+esc((f.saleTime||'').substring(0,10))+'</td></tr>';
+            });
+            h += '</tbody></table>';
+        } else {
+            h += '<p style="color:#e53935;text-align:center;padding:20px">未找到该产品的流通记录</p>';
+        }
+        $('#traceResult').html(h);
+    }}).fail(function(){
+        $('#traceResult').html('<p style="color:#e53935;text-align:center;padding:20px">无法连接服务器</p>');
+    });
+}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+</script>
+</body>
+</html>
