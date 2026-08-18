@@ -10,6 +10,8 @@ public interface SpectrumFileRepository extends JpaRepository<SpectrumFile, Long
 
     Optional<SpectrumFile> findByProductIdAndDataType(Long productId, String dataType);
 
+    List<SpectrumFile> findByProductIdOrderByDataTypeAsc(Long productId);
+
     List<SpectrumFile> findAllByOrderByProductIdAscDataTypeAsc();
 
     /** 列表：JOIN products 取名称/追溯码，按产品 ID + 类型排序 */

@@ -45,6 +45,16 @@ public class LocalStorageService implements StorageService {
         return Files.newInputStream(p);
     }
 
+    @Override
+    public void delete(String storedRef) throws IOException {
+        String rel = (storedRef != null && storedRef.startsWith("/uploads/"))
+                ? storedRef.substring("/uploads/".length()) : (storedRef == null ? "" : storedRef);
+        Path base = uploadPaths.getBase();
+        Path p = base.resolve(rel).normalize();
+        if (!p.startsWith(base)) throw new IOException("非法文件路径");
+        Files.deleteIfExists(p);
+    }
+
     /** 仅保留文件名（去掉路径），并替换非法字符 */
     private String sanitize(String name) {
         if (name == null) return "file";

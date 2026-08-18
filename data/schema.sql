@@ -158,3 +158,20 @@ CREATE TABLE feedbacks (
     contact     VARCHAR(100) DEFAULT NULL COMMENT '联系方式(选填)',
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '提交时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='意见反馈表';
+
+-- ============================================================
+-- 10. 回收站表 recycle_bin
+-- ============================================================
+DROP TABLE IF EXISTS recycle_bin;
+CREATE TABLE recycle_bin (
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    item_type   VARCHAR(20)  NOT NULL DEFAULT 'product' COMMENT '条目类型',
+    original_id BIGINT       DEFAULT NULL COMMENT '被删产品原 ID',
+    code        VARCHAR(20)  DEFAULT NULL COMMENT '追溯码(便于展示/检索)',
+    name        VARCHAR(100) DEFAULT NULL COMMENT '产品名(便于展示)',
+    snapshot    LONGTEXT     NOT NULL COMMENT 'JSON 快照(产品+记录+文件+流向)',
+    deleted_by  VARCHAR(50)  DEFAULT NULL COMMENT '删除操作人',
+    deleted_at  DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '删除时间',
+    INDEX idx_recycle_type (item_type),
+    INDEX idx_recycle_deleted_at (deleted_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='回收站表';

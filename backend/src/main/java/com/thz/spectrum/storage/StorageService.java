@@ -22,4 +22,7 @@ public interface StorageService {
 
     /** 读取已保存文件的内容（预览/下载/打包用） */
     InputStream open(String storedRef) throws IOException;
+
+    /** 永久删除已保存的文件（回收站彻底删除用） */
+    void delete(String storedRef) throws IOException;
 }

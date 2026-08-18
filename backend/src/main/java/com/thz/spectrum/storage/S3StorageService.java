@@ -4,6 +4,7 @@ import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -66,6 +67,16 @@ public class S3StorageService implements StorageService {
             return resp;
         } catch (Exception e) {
             throw new IOException("对象存储读取失败: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void delete(String storedRef) throws IOException {
+        String key = toKey(storedRef);
+        try {
+            client.removeObject(RemoveObjectArgs.builder().bucket(bucket).object(key).build());
+        } catch (Exception e) {
+            throw new IOException("对象存储删除失败: " + e.getMessage(), e);
         }
     }
 
