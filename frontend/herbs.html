@@ -33,49 +33,8 @@
     <div class="content-section">
         <h2 class="section-title">药材种类</h2>
         <p class="section-text">驻马店区域内主要中药材品种及其质量安全溯源信息：</p>
-        <div class="herb-grid">
-            <div class="herb-card">
-                <h3>黄芪</h3>
-                <p><strong>拉丁学名：</strong>Astragalus membranaceus</p>
-                <p><strong>药用部位：</strong>根</p>
-                <p><strong>产地：</strong>驻马店周边</p>
-                <p><strong>功效：</strong>补气升阳、固表止汗</p>
-            </div>
-            <div class="herb-card">
-                <h3>白芷</h3>
-                <p><strong>拉丁学名：</strong>Angelica dahurica</p>
-                <p><strong>药用部位：</strong>根</p>
-                <p><strong>产地：</strong>驻马店周边</p>
-                <p><strong>功效：</strong>解表散寒、祛风止痛</p>
-            </div>
-            <div class="herb-card">
-                <h3>当归</h3>
-                <p><strong>拉丁学名：</strong>Angelica sinensis</p>
-                <p><strong>药用部位：</strong>根</p>
-                <p><strong>产地：</strong>甘肃岷县</p>
-                <p><strong>功效：</strong>补血活血、调经止痛</p>
-            </div>
-            <div class="herb-card">
-                <h3>茯苓</h3>
-                <p><strong>拉丁学名：</strong>Wolfiporia extensa</p>
-                <p><strong>药用部位：</strong>菌核</p>
-                <p><strong>产地：</strong>湖南怀化</p>
-                <p><strong>功效：</strong>利水渗湿、健脾宁心</p>
-            </div>
-            <div class="herb-card">
-                <h3>三七</h3>
-                <p><strong>拉丁学名：</strong>Panax notoginseng</p>
-                <p><strong>药用部位：</strong>根及根茎</p>
-                <p><strong>产地：</strong>云南文山</p>
-                <p><strong>功效：</strong>散瘀止血、消肿定痛</p>
-            </div>
-            <div class="herb-card">
-                <h3>人参</h3>
-                <p><strong>拉丁学名：</strong>Panax ginseng</p>
-                <p><strong>药用部位：</strong>根</p>
-                <p><strong>产地：</strong>吉林长白山</p>
-                <p><strong>功效：</strong>大补元气、复脉固脱</p>
-            </div>
+        <div class="herb-grid" id="herbGrid">
+            <p style="color:#999;grid-column:1/-1;">加载中...</p>
         </div>
         <p class="section-text" style="margin-top:18px;">
             更多药材品种持续录入中，可通过首页追溯码查询获取对应检测信息。
@@ -101,6 +60,35 @@
 </div>
 <script src="js/config.js"></script>
 <script src="js/auth.js"></script>
+<script>
+function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
+(function () {
+    var grid = document.getElementById('herbGrid');
+    fetch(apiUrl('/api/products?page=0&size=100'))
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+            var items = (d && d.items) || [];
+            if (!items.length) {
+                grid.innerHTML = '<p style="color:#999;grid-column:1/-1;">暂无药材数据</p>';
+                return;
+            }
+            var h = '';
+            items.forEach(function (p) {
+                h += '<div class="herb-card">'
+                    + '<h3>' + esc(p.name) + '</h3>'
+                    + '<p><strong>产品码：</strong>' + esc(p.code) + '</p>'
+                    + '<p><strong>类型：</strong>' + esc(p.type) + '</p>'
+                    + '<p><strong>产地：</strong>' + esc(p.origin) + '</p>'
+                    + '<p><strong>简介：</strong>' + esc(p.description) + '</p>'
+                    + '</div>';
+            });
+            grid.innerHTML = h;
+        })
+        .catch(function () {
+            grid.innerHTML = '<p style="color:#e53935;grid-column:1/-1;">加载失败，请稍后重试</p>';
+        });
+})();
+</script>
 
 </body>
 </html>

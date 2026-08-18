@@ -90,6 +90,7 @@ public class QueryController {
             m.put("name", p.getName());
             m.put("type", p.getType());
             m.put("origin", p.getOrigin());
+            m.put("description", p.getDescription());
             return m;
         }).toList());
         return result;
