@@ -1,12 +1,17 @@
 /**
- * 前端全局配置
- * - 本地 / 单 jar 部署：API_BASE 保持空字符串（走同源相对路径）
- * - 前后端分离部署（Cloudflare Pages 前端 + Railway 后端）：
- *   把 API_BASE 改为后端地址，例如 https://你的项目.up.railway.app
+ * 前端全局配置（自动检测模式）
+ * - 部署在 Cloudflare Pages（*.pages.dev）时：API_BASE 指向线上 Railway 后端
+ * - 本地/自托管访问（localhost、127.0.0.1、其它主机名）：API_BASE 为空，走同源后端
+ * 无需手动修改即可在本地开发与线上部署之间切换。
  */
-window.APP_CONFIG = {
-    API_BASE: 'https://tx-production-53fa.up.railway.app'
-};
+(function () {
+    var host = window.location.hostname || '';
+    var apiBase = '';
+    if (host.indexOf('pages.dev') !== -1) {
+        apiBase = 'https://tx-production-53fa.up.railway.app';
+    }
+    window.APP_CONFIG = { API_BASE: apiBase };
+})();
 
 /** 拼接后端接口地址 */
 function apiUrl(path) {
