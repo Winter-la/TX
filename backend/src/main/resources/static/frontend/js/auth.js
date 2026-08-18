@@ -20,9 +20,15 @@ function clearSession() {
 }
 
 /* ================= 管理员登录（数据上传入口） ================= */
+/* 跳转管理后台时把 token 带在 URL 上，跨域后由管理后台页自行落盘，避免二次登录 */
+function adminUrl(token, role) {
+    var u = apiUrl('/admin/index.html');
+    return u + (u.indexOf('?') === -1 ? '?' : '&') + 'token=' + encodeURIComponent(token) + '&role=' + encodeURIComponent(role);
+}
+
 function openAdminLogin() {
     if (getToken() && getUserRole() === 'admin') {
-        window.location.href = apiUrl('/admin/index.html');
+        window.location.href = adminUrl(getToken(), getUserRole());
         return;
     }
     showModal('adminLoginModal');
@@ -35,7 +41,7 @@ function closeAdminLogin() {
 function adminLogin() {
     doLogin('adminLoginUser', 'adminLoginPwd', 'adminLoginError', function (d) {
         if (d.role === 'admin') {
-            window.location.href = apiUrl('/admin/index.html');
+            window.location.href = adminUrl(d.token, d.role);
         } else {
             setError('adminLoginError', '该账号无管理员权限');
         }
