@@ -5,7 +5,7 @@
  *   把 API_BASE 改为后端地址，例如 https://你的项目.up.railway.app
  */
 window.APP_CONFIG = {
-    API_BASE: ''
+    API_BASE: 'https://tx-production-53fa.up.railway.app'
 };
 
 /** 拼接后端接口地址 */
