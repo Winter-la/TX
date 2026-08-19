@@ -234,18 +234,28 @@ fi
 
 # ---------- H. 追溯录入 ----------
 echo "--- H. 追溯录入 ---"
-resp=$(curl -s -m 10 -X POST "$BASE/api/admin/trace/add" -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" -d '{"productCode":"TST001","buyerName":"TestBuyer","buyerPhone":"13800000000","buyerAddress":"Test Road 1","saleTime":"2026-08-18T10:00"}')
+resp=$(python "$TMPDIR/httputil.py" POST "$BASE/api/admin/trace/add" '{"productCode":"TST001","buyerName":"张三","buyerPhone":"13800000000","buyerAddress":"河南省驻马店市驿城区","idCard":"412801199001011234","saleTime":"2026-08-18T10:00"}' "$ADMIN_TOKEN" json)
 TRACE_CODE=$(echo "$resp" | python -c "import sys,json; d=json.load(sys.stdin); print(d.get('traceCode',''))")
 [ -n "$TRACE_CODE" ] && pass "追溯录入自动生成追溯码" || fail "追溯录入" "$resp"
-resp=$(curl -s -m 10 -X POST "$BASE/api/admin/trace/add" -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" -d "{\"productCode\":\"TST001\",\"buyerName\":\"X\",\"buyerPhone\":\"13900000000\",\"traceCode\":\"$TRACE_CODE\"}")
+resp=$(python "$TMPDIR/httputil.py" POST "$BASE/api/admin/trace/add" "{\"productCode\":\"TST001\",\"buyerName\":\"李四\",\"buyerPhone\":\"13900000000\",\"traceCode\":\"$TRACE_CODE\"}" "$ADMIN_TOKEN" json)
 echo "$resp" | python -c "import sys,json; sys.exit(0 if '已存在' in json.load(sys.stdin).get('error','') else 1)" && pass "重复追溯码被拒绝" || fail "重复追溯码" "$resp"
 resp=$(curl -s -m 10 -X POST "$BASE/api/admin/trace/add" -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" -d '{"productCode":"TST001","buyerName":""}')
 has_error "缺购买者被拒绝" "$resp"
+resp=$(curl -s -m 10 -X POST "$BASE/api/admin/trace/add" -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" -d '{"productCode":"TST001","buyerName":"AB","buyerPhone":"13800000000"}')
+echo "$resp" | python -c "import sys,json; sys.exit(0 if '姓名应为2-4个汉字' in json.load(sys.stdin).get('error','') else 1)" && pass "姓名非2-4个汉字被拒绝" || fail "姓名校验" "$resp"
+resp=$(python "$TMPDIR/httputil.py" POST "$BASE/api/admin/trace/add" '{"productCode":"TST001","buyerName":"王五","buyerPhone":"12345"}' "$ADMIN_TOKEN" json)
+echo "$resp" | python -c "import sys,json; sys.exit(0 if '11位' in json.load(sys.stdin).get('error','') else 1)" && pass "电话位数不符被拒绝" || fail "电话校验" "$resp"
+resp=$(python "$TMPDIR/httputil.py" POST "$BASE/api/admin/trace/add" '{"productCode":"TST001","buyerName":"赵六","buyerPhone":"13700000000","idCard":"12345"}' "$ADMIN_TOKEN" json)
+echo "$resp" | python -c "import sys,json; sys.exit(0 if '18位' in json.load(sys.stdin).get('error','') else 1)" && pass "身份证位数不符被拒绝" || fail "身份证校验" "$resp"
+resp=$(curl -s -m 10 "$BASE/api/admin/trace/by-product?productCode=TST001" -H "Authorization: Bearer $ADMIN_TOKEN")
+echo "$resp" | python -c "import sys,json
+d=json.load(sys.stdin); items=d.get('items',[])
+sys.exit(0 if any(i.get('buyerName')=='张三' for i in items) else 1)" && pass "按产品编码查询追溯记录" || fail "按产品查追溯" "$resp"
 if [ -n "$TRACE_CODE" ]; then
   resp=$(json_get "/api/trace/query?code=$TRACE_CODE")
   echo "$resp" | python -c "import sys,json
 d=json.load(sys.stdin); f=d.get('flows',[{}])[0]
-sys.exit(0 if (d.get('found') is True and f.get('buyerName')=='T********' and f.get('buyerPhone')=='138****0000') else 1)" && pass "公开查询返回脱敏数据" || fail "公开查询脱敏" "$resp"
+sys.exit(0 if (d.get('found') is True and f.get('buyerName')=='张*' and f.get('buyerPhone')=='138****0000') else 1)" && pass "公开查询返回脱敏数据" || fail "公开查询脱敏" "$resp"
 fi
 resp=$(curl -s -m 10 "$BASE/api/admin/trace/list?page=0&size=5" -H "Authorization: Bearer $ADMIN_TOKEN")
 echo "$resp" | python -c "import sys,json; sys.exit(0 if 'items' in json.load(sys.stdin) else 1)" && pass "管理端追溯列表" || fail "追溯列表" "$resp"

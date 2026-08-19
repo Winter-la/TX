@@ -111,19 +111,48 @@ public class TraceController {
     }
 
     /**
+     * 管理员：按产品编码查询其全部追溯记录（JWT保护）
+     * GET /api/admin/trace/by-product?productCode=xxx
+     */
+    @GetMapping("/api/admin/trace/by-product")
+    public Map<String, Object> listByProduct(@RequestParam String productCode) {
+        String pc = Texts.clip(productCode, 20);
+        List<Map<String, Object>> items = traceFlowRepo
+                .findByProductCodeOrderBySaleTimeDesc(pc).stream().map(f -> {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", f.getId());
+            m.put("traceCode", f.getTraceCode());
+            m.put("buyerName", f.getBuyerName());
+            m.put("buyerPhone", f.getBuyerPhone());
+            m.put("buyerAddress", f.getBuyerAddress());
+            m.put("idCard", f.getIdCard());
+            m.put("saleTime", f.getSaleTime());
+            return m;
+        }).toList();
+        return Map.of("items", items);
+    }
+
+    /**
      * 录入追溯信息（Admin，JWT保护）
      */
     @PostMapping("/api/admin/trace/add")
     public Map<String, Object> addTrace(@RequestBody Map<String, String> body) {
         String productCode = Texts.clip(body.get("productCode"), 20);
-        if (productCode == null || productCode.isBlank()) return Map.of("error", "产品码不能为空");
+        if (productCode == null || productCode.isBlank()) return Map.of("error", "产品编码不能为空");
         if (productRepo.findByCode(productCode).isEmpty())
-            return Map.of("error", "产品码不存在: " + productCode);
+            return Map.of("error", "产品编码不存在: " + productCode);
 
         String buyerName = Texts.clip(body.getOrDefault("buyerName", ""), 100);
         String buyerPhone = Texts.clip(body.getOrDefault("buyerPhone", ""), 30);
         if (buyerName == null || buyerName.isBlank()) return Map.of("error", "购买者姓名不能为空");
+        if (!buyerName.matches("^[\\u4e00-\\u9fa5]{2,4}$"))
+            return Map.of("error", "购买者姓名应为2-4个汉字");
         if (buyerPhone == null || buyerPhone.isBlank()) return Map.of("error", "联系电话不能为空");
+        if (!buyerPhone.matches("^1\\d{10}$"))
+            return Map.of("error", "联系电话应为11位手机号");
+        String idCard = Texts.clip(body.getOrDefault("idCard", ""), 30);
+        if (!idCard.isBlank() && !idCard.matches("^\\d{17}[\\dXx]$"))
+            return Map.of("error", "身份证号应为18位（末位可为X）");
 
         // 追溯码：使用传入值（校验唯一）或自动生成（时间戳+随机数防冲突）
         String traceCode = Texts.clip(body.getOrDefault("traceCode", ""), 50);
@@ -140,7 +169,7 @@ public class TraceController {
         tf.setBuyerName(buyerName);
         tf.setBuyerPhone(buyerPhone);
         tf.setBuyerAddress(Texts.clip(body.getOrDefault("buyerAddress", ""), 300));
-        tf.setIdCard(Texts.clip(body.getOrDefault("idCard", ""), 30));
+        tf.setIdCard(idCard);
         if (body.containsKey("saleTime")) {
             try { tf.setSaleTime(LocalDateTime.parse(body.get("saleTime"))); } catch (Exception e) {}
         }

@@ -41,7 +41,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtAuthInterceptor)
                 .addPathPatterns("/admin/**", "/api/content/**", "/api/admin/trace/**", "/api/spectrum/**")
                 .excludePathPatterns(
-                    "/admin", "/admin/login", "/admin/index.html",
+                    "/admin", "/admin/login", "/admin/index.html", "/admin/region-data.js",
                     "/api/content/policy-links",
                     "/api/content/announcements",
                     "/api/content/announcement/*",

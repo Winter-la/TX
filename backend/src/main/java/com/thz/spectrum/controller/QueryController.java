@@ -29,7 +29,7 @@ public class QueryController {
 
         if (opt.isEmpty()) {
             result.put("found", false);
-            result.put("message", "未找到该追溯码对应的产品");
+            result.put("message", "未找到该产品编码对应的产品");
             return result;
         }
 

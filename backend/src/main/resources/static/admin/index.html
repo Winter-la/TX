@@ -77,7 +77,7 @@ td .badge{background:#f5efe3;color:#8a6d3b;padding:2px 8px;border-radius:10px;fo
 
     <div class="tab-panel active" id="tabUpload">
         <form id="uploadForm" enctype="multipart/form-data">
-            <div class="form-row"><div class="form-group"><label>产品追溯码</label><input type="text" name="code" required maxlength="10"></div>
+            <div class="form-row"><div class="form-group"><label>产品编码</label><input type="text" name="code" required maxlength="10"></div>
                 <div class="form-group"><label>检测技术</label><input type="text" name="tech" value="太赫兹时域光谱 + 拉曼光谱"></div></div>
             <div class="form-row"><div class="form-group"><label>检测日期</label><input type="date" name="testDate"></div>
                 <div class="form-group"><label>匹配度 (%)</label><input type="number" step="0.1" name="matchRate"></div></div>
@@ -97,7 +97,7 @@ td .badge{background:#f5efe3;color:#8a6d3b;padding:2px 8px;border-radius:10px;fo
 
     <div class="tab-panel" id="tabAdd">
         <form id="addForm">
-            <div class="form-row-3" style="display:grid"><div class="form-group"><label>追溯码 *</label><input type="text" name="code" required maxlength="10"></div>
+            <div class="form-row-3" style="display:grid"><div class="form-group"><label>产品编码 *</label><input type="text" name="code" required maxlength="10"></div>
                 <div class="form-group"><label>产品名称 *</label><input type="text" name="name" required></div>
                 <div class="form-group"><label>产品别名</label><input type="text" name="alias"></div></div>
             <div class="form-row-3" style="display:grid"><div class="form-group"><label>类型 *</label><select name="type"><option>中草药</option><option>保健品</option><option>奶制品</option></select></div>
@@ -110,7 +110,7 @@ td .badge{background:#f5efe3;color:#8a6d3b;padding:2px 8px;border-radius:10px;fo
         <div class="result-msg" id="addResult"></div></div>
 
     <div class="tab-panel" id="tabList">
-        <table><thead><tr><th>追溯码</th><th>产品名称</th><th>类型</th><th>产地</th><th>匹配度</th><th>等级</th><th>时域图</th><th>频域图</th><th>操作</th></tr></thead>
+        <table><thead><tr><th>产品编码</th><th>产品名称</th><th>类型</th><th>产地</th><th>匹配度</th><th>等级</th><th>时域图</th><th>频域图</th><th>操作</th></tr></thead>
             <tbody id="productTableBody"><tr><td colspan="9" style="text-align:center;color:#999">加载中...</td></tr></tbody></table><div id="productPager" style="text-align:center;margin-top:10px"></div></div>
 
     <div class="tab-panel" id="tabContent">
@@ -132,19 +132,25 @@ td .badge{background:#f5efe3;color:#8a6d3b;padding:2px 8px;border-radius:10px;fo
 
     <div class="tab-panel" id="tabTrace">
         <form id="traceForm">
-            <div class="form-row"><div class="form-group"><label>产品码 *</label><input type="text" name="productCode" required maxlength="20"></div>
+            <div class="form-row"><div class="form-group"><label>产品编码 *</label><input type="text" name="productCode" required maxlength="20"></div>
                 <div class="form-group"><label>追溯码</label><input type="text" name="traceCode" placeholder="留空自动生成"></div></div>
-            <div class="form-row"><div class="form-group"><label>购买者姓名 *</label><input type="text" name="buyerName" required></div>
-                <div class="form-group"><label>联系电话 *</label><input type="text" name="buyerPhone" required></div></div>
-            <div class="form-row"><div class="form-group"><label>收货地址</label><input type="text" name="buyerAddress"></div>
-                <div class="form-group"><label>身份证号</label><input type="text" name="idCard"></div></div>
-            <div class="form-group"><label>销售时间</label><input type="datetime-local" name="saleTime"></div>
+            <div class="form-row"><div class="form-group"><label>购买者姓名 *</label><input type="text" name="buyerName" required maxlength="4" placeholder="2-4个汉字"></div>
+                <div class="form-group"><label>联系电话 *</label><input type="text" name="buyerPhone" required maxlength="11" inputmode="numeric" placeholder="11位手机号"></div></div>
+            <div class="form-group"><label>收货地址</label>
+                <div class="form-row-3" style="display:grid">
+                    <select id="addrProvince"><option value="">省</option></select>
+                    <select id="addrCity" disabled><option value="">市</option></select>
+                    <select id="addrDistrict" disabled><option value="">县/区</option></select>
+                </div>
+            </div>
+            <div class="form-row"><div class="form-group"><label>身份证号</label><input type="text" name="idCard" maxlength="18" placeholder="18位身份证号"></div>
+                <div class="form-group"><label>销售时间</label><input type="datetime-local" name="saleTime"></div></div>
             <button type="submit" class="btn">录入追溯信息</button>
         </form>
         <div class="result-msg" id="traceResultMsg"></div>
         <hr style="margin:20px 0;border-color:#e2d9c8">
         <h4 style="font-size:14px;color:#4a3a1f;margin-bottom:10px">追溯码记录</h4>
-        <table><thead><tr><th>追溯码</th><th>产品码</th><th>购买者</th><th>电话</th><th>时间</th></tr></thead>
+        <table><thead><tr><th>追溯码</th><th>产品编码</th><th>购买者</th><th>电话</th><th>时间</th></tr></thead>
             <tbody id="traceListBody"><tr><td colspan="5" style="text-align:center;color:#999">加载中...</td></tr></tbody></table>
         <div id="tracePager" style="text-align:center;margin-top:10px"></div>
     </div>
@@ -190,11 +196,12 @@ td .badge{background:#f5efe3;color:#8a6d3b;padding:2px 8px;border-radius:10px;fo
             <p style="font-size:12px;color:#999;margin:0">删除的产品先进入回收站，可恢复或彻底删除（彻底删除会连同文件一起清除）</p>
             <button class="btn" onclick="emptyRecycle()" style="padding:6px 16px;font-size:12px">清空回收站</button>
         </div>
-        <table><thead><tr><th>追溯码</th><th>产品名称</th><th>删除人</th><th>删除时间</th><th>操作</th></tr></thead>
+        <table><thead><tr><th>产品编码</th><th>产品名称</th><th>删除人</th><th>删除时间</th><th>操作</th></tr></thead>
             <tbody id="recycleListBody"><tr><td colspan="5" style="text-align:center;color:#999">加载中...</td></tr></tbody></table>
     </div>
 </div></div></div>
 
+<script src="region-data.js"></script>
 <script>
 var T=localStorage.getItem('adminToken')||'';
 function AH(e){var h=e||{};if(T)h['Authorization']='Bearer '+T;return h}
@@ -209,7 +216,9 @@ document.getElementById('uploadForm').addEventListener('submit',function(e){e.pr
 document.getElementById('addForm').addEventListener('submit',function(e){e.preventDefault();var d={};new FormData(this).forEach(function(v,k){d[k]=v});var msg=document.getElementById('addResult');msg.className='result-msg loading';msg.textContent='添加中...';fetch('/admin/products/add',{method:'POST',headers:AH({'Content-Type':'application/json'}),body:JSON.stringify(d)}).then(function(r){return r.json()}).then(function(d){if(d.success){msg.className='result-msg success';msg.textContent=d.message;loadProductList()}else{msg.className='result-msg error';msg.textContent=(d.error||'失败')}})});
 
 function switchContentForm(t){document.getElementById('ctPolicyFields').style.display=(t==='policy'||t==='news')?'block':'none';document.getElementById('ctAnnounceFields').style.display=t==='announce'?'block':'none'}
-document.getElementById('traceForm').addEventListener('submit',function(e){e.preventDefault();var d={};new FormData(this).forEach(function(v,k){d[k]=v});var msg=document.getElementById('traceResultMsg');msg.className='result-msg loading';msg.textContent='录入中...';fetch('/api/admin/trace/add',{method:'POST',headers:AH({'Content-Type':'application/json'}),body:JSON.stringify(d)}).then(function(r){return r.json()}).then(function(d){if(d.success){msg.className='result-msg success';msg.textContent='追溯码: '+d.traceCode+' 已录入'}else{msg.className='result-msg error';msg.textContent=(d.error||'失败')}})});
+/* ===== 三级省市区联动 ===== */
+(function(){var regs=window.CHINA_REGIONS||[];var pSel=document.getElementById('addrProvince');if(!pSel)return;var cSel=document.getElementById('addrCity'),dSel=document.getElementById('addrDistrict');regs.forEach(function(p){var o=document.createElement('option');o.value=p.n;o.textContent=p.n;pSel.appendChild(o)});pSel.onchange=function(){var pn=pSel.value;cSel.innerHTML='<option value="">市</option>';dSel.innerHTML='<option value="">县/区</option>';dSel.disabled=true;var p=null;regs.forEach(function(x){if(x.n===pn)p=x});if(!p){cSel.disabled=true;return}cSel.disabled=false;p.c.forEach(function(c){var o=document.createElement('option');o.value=c.n;o.textContent=c.n;cSel.appendChild(o)})};cSel.onchange=function(){var pn=pSel.value,cn=cSel.value;dSel.innerHTML='<option value="">县/区</option>';var p=null;regs.forEach(function(x){if(x.n===pn)p=x});var c=null;if(p)p.c.forEach(function(x){if(x.n===cn)c=x});if(!c||!c.d.length){dSel.disabled=true;return}dSel.disabled=false;c.d.forEach(function(d){var o=document.createElement('option');o.value=d;o.textContent=d;dSel.appendChild(o)})}})();
+document.getElementById('traceForm').addEventListener('submit',function(e){e.preventDefault();var msg=document.getElementById('traceResultMsg');var f=this,d={};new FormData(f).forEach(function(v,k){d[k]=v});var name=(d.buyerName||'').trim(),phone=(d.buyerPhone||'').trim(),idc=(d.idCard||'').trim();var err='';if(!/^[\u4e00-\u9fa5]{2,4}$/.test(name))err='购买者姓名应为2-4个汉字';else if(!/^1[0-9]{10}$/.test(phone))err='联系电话应为11位手机号';else if(idc&&!/^[0-9]{17}[0-9Xx]$/.test(idc))err='身份证号应为18位（末位可为X）';var prov=document.getElementById('addrProvince').value,city=document.getElementById('addrCity').value,dist=document.getElementById('addrDistrict').value;if(!err&&(prov||city||dist)&&!(prov&&city&&dist))err='请完整选择省/市/县区';if(err){msg.className='result-msg error';msg.textContent=err;return}d.buyerAddress=[prov,city,dist].filter(function(x){return x}).join('');msg.className='result-msg loading';msg.textContent='录入中...';fetch('/api/admin/trace/add',{method:'POST',headers:AH({'Content-Type':'application/json'}),body:JSON.stringify(d)}).then(function(r){return r.json()}).then(function(d){if(d.success){msg.className='result-msg success';msg.textContent='追溯码: '+d.traceCode+' 已录入';f.reset();loadTraceList()}else{msg.className='result-msg error';msg.textContent=(d.error||'失败')}}).catch(function(){msg.className='result-msg error';msg.textContent='网络错误'})});
 document.getElementById('contentForm').addEventListener('submit',function(e){e.preventDefault();var fd=new FormData(this),type=fd.get('contentType'),msg=document.getElementById('contentResult');msg.className='result-msg loading';msg.textContent='发布中...';
 if(type==='policy'||type==='news'){
     var body={title:fd.get('contentTitle'),url:fd.get('contentUrl'),summary:fd.get('contentSummary')};
@@ -232,7 +241,9 @@ var tracePage=0;
 function renderPager(id,cur,total,cb){window._pagers=window._pagers||{};window._pagers[id]=cb;var pg='';if(total>1){pg+='<button onclick="window._pagers[\''+id+'\']('+(cur-1)+')" '+(cur===0?'disabled':'')+' style="margin:2px;padding:4px 10px;border:1px solid #d8cdb8;border-radius:4px;cursor:pointer">上一页</button>';for(var i=0;i<total;i++)pg+='<button onclick="window._pagers[\''+id+'\']('+i+')" style="margin:2px;padding:4px 10px;border:1px solid #d8cdb8;border-radius:4px;cursor:pointer;'+(i===cur?'background:#8a6d3b;color:#fff':'')+'">'+(i+1)+'</button>';pg+='<button onclick="window._pagers[\''+id+'\']('+(cur+1)+')" '+(cur>=total-1?'disabled':'')+' style="margin:2px;padding:4px 10px;border:1px solid #d8cdb8;border-radius:4px;cursor:pointer">下一页</button>'}document.getElementById(id).innerHTML=pg}
 function loadTraceList(p){if(p!==undefined)tracePage=p;fetch('/api/admin/trace/list?page='+tracePage+'&size=5',{headers:AH()}).then(function(r){return r.json()}).then(function(d){var h='';d.items.forEach(function(f){h+='<tr><td>'+esc(f.traceCode)+'</td><td>'+esc(f.productCode)+'</td><td>'+esc(f.buyerName)+'</td><td>'+esc(f.buyerPhone)+'</td><td>'+esc((f.saleTime||'').substring(0,10))+'</td></tr>'});document.getElementById('traceListBody').innerHTML=h||'<tr><td colspan="5" style="text-align:center;color:#999">暂无记录</td></tr>';renderPager('tracePager',tracePage,d.pages,function(i){loadTraceList(i)})})}
 var productPage=0;
-function loadProductList(p){if(p!==undefined)productPage=p;fetch('/admin/products?page='+productPage+'&size=5',{headers:AH()}).then(function(r){return r.json()}).then(function(d){var h='';d.items.forEach(function(p){h+='<tr><td><strong>'+esc(p.code)+'</strong></td><td>'+esc(p.name)+'</td><td><span class="badge">'+esc(p.type)+'</span></td><td>'+esc(p.origin||'—')+'</td><td>'+esc(p.match_rate||'—')+'</td><td>'+esc(p.grade||'—')+'</td><td>'+(p.image_time?'<a href="'+safeUrl(p.image_time)+'" target="_blank">&#x1f5bc;</a>':'—')+'</td><td>'+(p.image_freq?'<a href="'+safeUrl(p.image_freq)+'" target="_blank">&#x1f5bc;</a>':'—')+'</td><td><span style="color:#e53935;cursor:pointer;font-size:12px" onclick="deleteProduct('+p.id+')">删除</span></td></tr>'});document.getElementById('productTableBody').innerHTML=h||'<tr><td colspan="9" style="text-align:center;color:#999">暂无产品</td></tr>';renderPager('productPager',productPage,d.pages,function(i){loadProductList(i)})})}
+function loadProductList(p){if(p!==undefined)productPage=p;fetch('/admin/products?page='+productPage+'&size=5',{headers:AH()}).then(function(r){return r.json()}).then(function(d){var h='';d.items.forEach(function(p){h+='<tr><td><strong>'+esc(p.code)+'</strong></td><td>'+esc(p.name)+'</td><td><span class="badge">'+esc(p.type)+'</span></td><td>'+esc(p.origin||'—')+'</td><td>'+esc(p.match_rate||'—')+'</td><td>'+esc(p.grade||'—')+'</td><td>'+(p.image_time?'<a href="'+safeUrl(p.image_time)+'" target="_blank">&#x1f5bc;</a>':'—')+'</td><td>'+(p.image_freq?'<a href="'+safeUrl(p.image_freq)+'" target="_blank">&#x1f5bc;</a>':'—')+'</td><td><span style="color:#27ae60;cursor:pointer;font-size:12px;margin-right:8px" onclick="toggleTraceView(\''+esc(p.code)+'\',this)">查看追溯</span><span style="color:#e53935;cursor:pointer;font-size:12px" onclick="deleteProduct('+p.id+')">删除</span></td></tr>'});document.getElementById('productTableBody').innerHTML=h||'<tr><td colspan="9" style="text-align:center;color:#999">暂无产品</td></tr>';renderPager('productPager',productPage,d.pages,function(i){loadProductList(i)})})}
+var traceViewCache={};
+function toggleTraceView(code,btn){var tr=btn.parentNode.parentNode;var next=tr.nextElementSibling;if(next&&next.className==='trace-detail-row'){next.remove();return}var detail=document.createElement('tr');detail.className='trace-detail-row';var td=document.createElement('td');td.colSpan=9;td.style.background='#faf6ee';td.style.padding='12px 14px';detail.appendChild(td);tr.parentNode.insertBefore(detail,tr.nextSibling);if(traceViewCache[code]){td.innerHTML=traceViewCache[code];return}td.innerHTML='<span style="color:#999">加载中...</span>';fetch('/api/admin/trace/by-product?productCode='+encodeURIComponent(code),{headers:AH()}).then(function(r){return r.json()}).then(function(d){var items=d.items||[];if(!items.length){td.innerHTML='<span style="color:#999">该产品暂无追溯记录</span>';traceViewCache[code]=td.innerHTML;return}var h='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th>追溯码</th><th>购买者</th><th>电话</th><th>身份证号</th><th>收货地址</th><th>销售时间</th></tr></thead><tbody>';items.forEach(function(f){h+='<tr><td>'+esc(f.traceCode)+'</td><td>'+esc(f.buyerName)+'</td><td>'+esc(f.buyerPhone)+'</td><td>'+esc(f.idCard||'—')+'</td><td>'+esc(f.buyerAddress||'—')+'</td><td>'+esc((f.saleTime||'').substring(0,16).replace('T',' '))+'</td></tr>'});h+='</tbody></table>';td.innerHTML=h;traceViewCache[code]=h}).catch(function(){td.innerHTML='<span style="color:#e53935">加载失败</span>';traceViewCache[code]=td.innerHTML})}
 function deleteProduct(id){if(!confirm('确认删除该产品？删除后可在回收站恢复。'))return;fetch('/admin/products/'+id,{method:'DELETE',headers:AH()}).then(function(r){return r.json()}).then(function(d){if(d.success){alert(d.message||'已删除');loadProductList()}else{alert(d.error||'删除失败')}}).catch(function(){alert('网络错误')})}
 function loadRecycleList(){fetch('/admin/recycle',{headers:AH()}).then(function(r){return r.json()}).then(function(d){var h='';d.forEach(function(x){h+='<tr><td>'+esc(x.code||'—')+'</td><td>'+esc(x.name||'—')+'</td><td>'+esc(x.deletedBy||'—')+'</td><td>'+esc((x.deletedAt||'').substring(0,16).replace('T',' '))+'</td><td><span style="color:#27ae60;cursor:pointer;font-size:12px;margin-right:8px" onclick="restoreRecycle('+x.id+')">恢复</span><span style="color:#e53935;cursor:pointer;font-size:12px" onclick="deleteRecycle('+x.id+')">彻底删除</span></td></tr>'});document.getElementById('recycleListBody').innerHTML=h||'<tr><td colspan="5" style="text-align:center;color:#999">回收站为空</td></tr>'})}
 function restoreRecycle(id){if(!confirm('确认恢复该产品？'))return;fetch('/admin/recycle/'+id+'/restore',{method:'POST',headers:AH()}).then(function(r){return r.json()}).then(function(d){if(d.success){alert(d.message||'已恢复');loadRecycleList();loadProductList()}else{alert(d.error||'恢复失败')}}).catch(function(){alert('网络错误')})}

@@ -128,12 +128,12 @@ public class AdminController {
     @PostMapping("/products/add")
     public Map<String, Object> addProduct(@RequestBody Map<String, String> body) {
         String code = body.get("code");
-        if (code == null || code.isBlank()) return Map.of("error", "追溯码不能为空");
+        if (code == null || code.isBlank()) return Map.of("error", "产品编码不能为空");
         code = code.trim();
         if (!code.matches("^[A-Za-z0-9_-]{1,20}$"))
-            return Map.of("error", "追溯码仅允许字母、数字、下划线、连字符，且不超过 20 位");
+            return Map.of("error", "产品编码仅允许字母、数字、下划线、连字符，且不超过 20 位");
         if (productRepo.findByCode(code).isPresent())
-            return Map.of("error", "追溯码 " + code + " 已存在");
+            return Map.of("error", "产品编码 " + code + " 已存在");
 
         Product p = new Product();
         p.setCode(Texts.clip(code, 20));
