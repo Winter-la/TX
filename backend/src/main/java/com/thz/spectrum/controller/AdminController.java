@@ -135,9 +135,14 @@ public class AdminController {
         if (productRepo.findByCode(code).isPresent())
             return Map.of("error", "产品编码 " + code + " 已存在");
 
+        String name = Texts.clip(body.getOrDefault("name", ""), 100);
+        if (name == null || name.isBlank()) return Map.of("error", "产品名称不能为空");
+        if (productRepo.findByName(name).isPresent())
+            return Map.of("error", "产品名称 " + name + " 已存在");
+
         Product p = new Product();
         p.setCode(Texts.clip(code, 20));
-        p.setName(Texts.clip(body.getOrDefault("name", ""), 100));
+        p.setName(name);
         p.setAlias(Texts.clip(body.get("alias"), 100));
         p.setType(Texts.clip(body.getOrDefault("type", "中草药"), 20));
         p.setOrigin(Texts.clip(body.get("origin"), 200));

@@ -163,6 +163,8 @@ echo "$resp" | python -c "import sys,json; sys.exit(0 if '原密码错误' in js
 echo "--- E. 产品新增与图谱上传 ---"
 py_json_post "新增测试产品 TST001(含中文)" "/admin/products/add" '{"code":"TST001","name":"测试药材","type":"中草药","origin":"测试产地"}' "$ADMIN_TOKEN"
 post_json "重复产品码被拒绝" "/admin/products/add" '{"code":"TST001","name":"dup"}' "$ADMIN_TOKEN" False
+resp=$(python "$TMPDIR/httputil.py" POST "$BASE/admin/products/add" '{"code":"DUPNAME","name":"测试药材"}' "$ADMIN_TOKEN" json)
+echo "$resp" | python -c "import sys,json; sys.exit(0 if '已存在' in json.load(sys.stdin).get('error','') else 1)" && pass "重复产品名称被拒绝" || fail "重复产品名称" "$resp"
 resp=$(curl -s -m 10 -X POST "$BASE/admin/products/add" -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" -d '{"code":"TST!!非法","name":"x"}')
 has_error "非法产品码被拒绝" "$resp"
 python - <<'PYEOF'
