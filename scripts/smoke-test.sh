@@ -161,12 +161,6 @@ echo "$resp" | python -c "import sys,json; sys.exit(0 if '原密码错误' in js
 
 # ---------- E. 产品新增与图谱上传 ----------
 echo "--- E. 产品新增与图谱上传 ---"
-py_json_post "新增测试产品 TST001(含中文)" "/admin/products/add" '{"code":"TST001","name":"测试药材","type":"中草药","origin":"测试产地"}' "$ADMIN_TOKEN"
-post_json "重复产品码被拒绝" "/admin/products/add" '{"code":"TST001","name":"dup"}' "$ADMIN_TOKEN" False
-resp=$(python "$TMPDIR/httputil.py" POST "$BASE/admin/products/add" '{"code":"DUPNAME","name":"测试药材"}' "$ADMIN_TOKEN" json)
-echo "$resp" | python -c "import sys,json; sys.exit(0 if '已存在' in json.load(sys.stdin).get('error','') else 1)" && pass "重复产品名称被拒绝" || fail "重复产品名称" "$resp"
-resp=$(curl -s -m 10 -X POST "$BASE/admin/products/add" -H "Authorization: Bearer $ADMIN_TOKEN" -H "Content-Type: application/json" -d '{"code":"TST!!非法","name":"x"}')
-has_error "非法产品码被拒绝" "$resp"
 python - <<'PYEOF'
 import struct, zlib
 def png(path):
@@ -180,6 +174,15 @@ open('smoke_tmp/time.txt','w').write('0.1 1.2\n0.2 2.3\n0.3 3.4\n0.4 4.5\n')
 open('smoke_tmp/freq.txt','w').write('0.5 5.6\n0.6 6.7\n')
 PYEOF
 [ -s smoke_tmp/test.png ] && pass "测试素材生成" || fail "测试素材生成" ""
+py_form_post "新增测试产品 TST001(含中文+药材图片)" "/admin/products/add" '{"code":"TST001","name":"测试药材","type":"中草药","origin":"测试产地"}' "$ADMIN_TOKEN" image:smoke_tmp/test.png
+resp=$(json_get "/api/query?code=TST001")
+echo "$resp" | python -c "import sys,json; d=json.load(sys.stdin); sys.exit(0 if d.get('product',{}).get('image') else 1)" && pass "产品查询返回药材图片" || fail "药材图片" "$resp"
+resp=$(curl -s -m 10 -X POST "$BASE/admin/products/add" -H "Authorization: Bearer $ADMIN_TOKEN" -F "code=TST001" -F "name=dup")
+echo "$resp" | python -c "import sys,json; sys.exit(0 if '已存在' in json.load(sys.stdin).get('error','') else 1)" && pass "重复产品码被拒绝" || fail "重复产品码" "$resp"
+resp=$(python "$TMPDIR/httputil.py" POST "$BASE/admin/products/add" '{"code":"DUPNAME","name":"测试药材"}' "$ADMIN_TOKEN" form)
+echo "$resp" | python -c "import sys,json; sys.exit(0 if '已存在' in json.load(sys.stdin).get('error','') else 1)" && pass "重复产品名称被拒绝" || fail "重复产品名称" "$resp"
+resp=$(python "$TMPDIR/httputil.py" POST "$BASE/admin/products/add" '{"code":"TST!!非法","name":"x"}' "$ADMIN_TOKEN" form)
+has_error "非法产品码被拒绝" "$resp"
 py_form_post "上传图谱+源数据(含中文字段)" "/admin/upload" '{"code":"TST001","tech":"太赫兹时域光谱","matchRate":"97.5","grade":"一级"}' "$ADMIN_TOKEN" imageTime:smoke_tmp/test.png spectrumTimeFile:smoke_tmp/time.txt
 resp=$(json_get "/api/query?code=TST001")
 echo "$resp" | python -c "import sys,json; d=json.load(sys.stdin); sys.exit(0 if d.get('spectrum',{}).get('image_time') else 1)" && pass "TST001 查询返回图片" || fail "TST001 图片" "$resp"

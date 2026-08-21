@@ -125,9 +125,31 @@ public class AdminController {
         return result;
     }
 
+    @GetMapping("/products/codes")
+    public List<Map<String, Object>> listCodes() {
+        return productRepo.findAll().stream()
+                .sorted(Comparator.comparing(Product::getCode))
+                .<Map<String, Object>>map(p -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("code", p.getCode());
+                    m.put("name", p.getName());
+                    return m;
+                })
+                .toList();
+    }
+
     @PostMapping("/products/add")
-    public Map<String, Object> addProduct(@RequestBody Map<String, String> body) {
-        String code = body.get("code");
+    public Map<String, Object> addProduct(
+            @RequestParam String code,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String alias,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String origin,
+            @RequestParam(required = false) String latin,
+            @RequestParam(required = false) String part,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String conclusion,
+            @RequestParam(required = false) MultipartFile image) {
         if (code == null || code.isBlank()) return Map.of("error", "产品编码不能为空");
         code = code.trim();
         if (!code.matches("^[A-Za-z0-9_-]{1,20}$"))
@@ -135,21 +157,35 @@ public class AdminController {
         if (productRepo.findByCode(code).isPresent())
             return Map.of("error", "产品编码 " + code + " 已存在");
 
-        String name = Texts.clip(body.getOrDefault("name", ""), 100);
-        if (name == null || name.isBlank()) return Map.of("error", "产品名称不能为空");
-        if (productRepo.findByName(name).isPresent())
-            return Map.of("error", "产品名称 " + name + " 已存在");
+        String nm = Texts.clip(name, 100);
+        if (nm == null || nm.isBlank()) return Map.of("error", "产品名称不能为空");
+        if (productRepo.findByName(nm).isPresent())
+            return Map.of("error", "产品名称 " + nm + " 已存在");
 
         Product p = new Product();
         p.setCode(Texts.clip(code, 20));
-        p.setName(name);
-        p.setAlias(Texts.clip(body.get("alias"), 100));
-        p.setType(Texts.clip(body.getOrDefault("type", "中草药"), 20));
-        p.setOrigin(Texts.clip(body.get("origin"), 200));
-        p.setLatin(Texts.clip(body.get("latin"), 200));
-        p.setPart(Texts.clip(body.get("part"), 100));
-        p.setDescription(Texts.clip(body.get("description"), 2000));
-        p.setConclusion(Texts.clip(body.get("conclusion"), 200));
+        p.setName(nm);
+        p.setAlias(Texts.clip(alias, 100));
+        p.setType(Texts.clip(type == null ? "中草药" : type, 20));
+        p.setOrigin(Texts.clip(origin, 200));
+        p.setLatin(Texts.clip(latin, 200));
+        p.setPart(Texts.clip(part, 100));
+        p.setDescription(Texts.clip(description, 2000));
+        p.setConclusion(Texts.clip(conclusion, 200));
+
+        // 药材图片（可选）
+        if (image != null && !image.isEmpty()) {
+            if (!isImageFile(image))
+                return Map.of("error", "药材图片仅支持图片格式（png/jpg/jpeg/gif/webp/bmp）");
+            String safeCode = code.replaceAll("[^A-Za-z0-9_-]", "_");
+            String filename = safeCode + "_product" + getExtension(image.getOriginalFilename());
+            try {
+                String url = storageService.store("products", filename, image.getInputStream(), image.getSize());
+                p.setImage(url);
+            } catch (IOException e) {
+                return Map.of("error", "药材图片上传失败: " + e.getMessage());
+            }
+        }
         productRepo.save(p);
 
         SpectrumRecord r = new SpectrumRecord();

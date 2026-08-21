@@ -46,6 +46,7 @@ public class QueryController {
         product.put("latin",       p.getLatin());
         product.put("part",        p.getPart());
         product.put("description", p.getDescription());
+        product.put("image",       p.getImage());
         product.put("conclusion",  p.getConclusion());
         result.put("product", product);
 

@@ -83,6 +83,14 @@ function fillResult(resp, code) {
         $('#productDescRow').hide();
     }
 
+    // 药材图片
+    if (p.image) {
+        $('#imgProduct').attr('src', fileUrl(p.image));
+        $('#productImageRow').show();
+    } else {
+        $('#productImageRow').hide();
+    }
+
     // 检测信息
     $('#rTech').text(s.tech || '\u2014');
     $('#rDate').text(s.test_date || '\u2014');
@@ -127,6 +135,7 @@ function showNotFound(code) {
     $('#rCode,#rType,#rOrigin,#rLatin,#rPart,#rTech,#rDate,#rMatch,#rGrade').text('\u2014');
     $('#rConclusion').text('\u26a0\ufe0f 数据库中未匹配到该追溯码\u2014');
     $('#productDescRow').hide();
+    $('#productImageRow').hide();
     $r.addClass('show');
     $r.find('.status').text('\u274c 未匹配').css('background', '#e53935');
     scrollToResult();
@@ -140,6 +149,7 @@ function showError(msg) {
     $('#rCode,#rType,#rOrigin,#rLatin,#rPart,#rTech,#rDate,#rMatch,#rGrade').text('\u2014');
     $('#rConclusion').text('\u26a0\ufe0f ' + msg);
     $('#productDescRow').hide();
+    $('#productImageRow').hide();
     $r.addClass('show');
     $r.find('.status').text('\u26a0\ufe0f 错误').css('background', '#e53935');
     scrollToResult();

@@ -35,6 +35,9 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(length = 500)
+    private String image;
+
     @Column(length = 200)
     private String conclusion;
 
@@ -72,6 +75,9 @@ public class Product {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 
     public String getConclusion() { return conclusion; }
     public void setConclusion(String conclusion) { this.conclusion = conclusion; }

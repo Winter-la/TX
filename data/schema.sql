@@ -26,6 +26,7 @@ CREATE TABLE products (
     latin       VARCHAR(200)  DEFAULT NULL           COMMENT '拉丁学名',
     part        VARCHAR(100)  DEFAULT NULL           COMMENT '药用部位',
     description TEXT          DEFAULT NULL           COMMENT '产品简介',
+    image       VARCHAR(500)  DEFAULT NULL           COMMENT '药材图片（相对路径或URL）',
     conclusion  VARCHAR(200)  DEFAULT NULL           COMMENT '鉴定结论',
     created_at  DATETIME      DEFAULT CURRENT_TIMESTAMP  COMMENT '创建时间',
     updated_at  DATETIME      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',

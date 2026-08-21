@@ -54,7 +54,7 @@ public class RecycleService {
         snapshot.put("records", records.stream().map(this::recordMap).toList());
         snapshot.put("spectrumFiles", sfiles.stream().map(this::fileMap).toList());
         snapshot.put("traces", traces.stream().map(this::traceMap).toList());
-        snapshot.put("fileRefs", collectFileRefs(records, sfiles));
+        snapshot.put("fileRefs", collectFileRefs(records, sfiles, p.getImage()));
 
         RecycleBin rb = new RecycleBin();
         rb.setItemType("product");
@@ -97,6 +97,7 @@ public class RecycleService {
         p.setLatin(str(pm.get("latin")));
         p.setPart(str(pm.get("part")));
         p.setDescription(str(pm.get("description")));
+        p.setImage(str(pm.get("image")));
         p.setConclusion(str(pm.get("conclusion")));
         productRepo.save(p);
 
@@ -213,6 +214,7 @@ public class RecycleService {
         m.put("latin", p.getLatin());
         m.put("part", p.getPart());
         m.put("description", p.getDescription());
+        m.put("image", p.getImage());
         m.put("conclusion", p.getConclusion());
         return m;
     }
@@ -251,13 +253,14 @@ public class RecycleService {
         return m;
     }
 
-    private List<String> collectFileRefs(List<SpectrumRecord> records, List<SpectrumFile> files) {
+    private List<String> collectFileRefs(List<SpectrumRecord> records, List<SpectrumFile> files, String productImage) {
         Set<String> refs = new LinkedHashSet<>();
         for (SpectrumRecord r : records) {
             addRef(refs, r.getImagePathTime());
             addRef(refs, r.getImagePathFreq());
         }
         for (SpectrumFile f : files) addRef(refs, f.getFilePath());
+        addRef(refs, productImage);
         return new ArrayList<>(refs);
     }
 

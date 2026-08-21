@@ -45,6 +45,14 @@ table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{padding:9px 10px;text-align:left;border-bottom:1px solid #eee}
 th{background:#faf6ee;color:#555;font-weight:600}
 td .badge{background:#f5efe3;color:#8a6d3b;padding:2px 8px;border-radius:10px;font-size:11px}
+.combobox{position:relative}
+.combobox input{width:100%;padding:9px 12px;border:1px solid #d8cdb8;border-radius:6px;font-size:14px;outline:none;font-family:inherit;box-sizing:border-box}
+.combobox input:focus{border-color:#8a6d3b}
+.combobox-list{position:absolute;top:100%;left:0;right:0;max-height:220px;overflow-y:auto;background:#fff;border:1px solid #d8cdb8;border-radius:6px;margin-top:4px;z-index:60;display:none;box-shadow:0 8px 20px rgba(0,0,0,0.12)}
+.combobox-item{padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0ede4}
+.combobox-item:hover,.combobox-item.active{background:#faf6ee;color:#8a6d3b}
+.combobox-item .ci-name{color:#999;font-size:12px;margin-left:8px}
+.combobox-empty{padding:10px 12px;color:#999;font-size:13px}
 </style>
 </head>
 <body>
@@ -77,7 +85,12 @@ td .badge{background:#f5efe3;color:#8a6d3b;padding:2px 8px;border-radius:10px;fo
 
     <div class="tab-panel active" id="tabUpload">
         <form id="uploadForm" enctype="multipart/form-data">
-            <div class="form-row"><div class="form-group"><label>产品编码</label><input type="text" name="code" required maxlength="10"></div>
+            <div class="form-row"><div class="form-group"><label>产品编码</label>
+                <div class="combobox" id="codeCombo">
+                    <input type="text" id="codeComboInput" placeholder="输入或选择产品编码" autocomplete="off">
+                    <input type="hidden" name="code" id="codeComboValue">
+                    <div class="combobox-list" id="codeComboList"></div>
+                </div></div>
                 <div class="form-group"><label>检测技术</label><input type="text" name="tech" value="太赫兹时域光谱 + 拉曼光谱"></div></div>
             <div class="form-row"><div class="form-group"><label>检测日期</label><input type="date" name="testDate"></div>
                 <div class="form-group"><label>匹配度 (%)</label><input type="number" step="0.1" name="matchRate"></div></div>
@@ -96,7 +109,7 @@ td .badge{background:#f5efe3;color:#8a6d3b;padding:2px 8px;border-radius:10px;fo
         <div class="result-msg" id="uploadResult"></div></div>
 
     <div class="tab-panel" id="tabAdd">
-        <form id="addForm">
+        <form id="addForm" enctype="multipart/form-data">
             <div class="form-row-3" style="display:grid"><div class="form-group"><label>产品编码 *</label><input type="text" name="code" required maxlength="10"></div>
                 <div class="form-group"><label>产品名称 *</label><input type="text" name="name" required></div>
                 <div class="form-group"><label>产品别名</label><input type="text" name="alias"></div></div>
@@ -106,6 +119,9 @@ td .badge{background:#f5efe3;color:#8a6d3b;padding:2px 8px;border-radius:10px;fo
             <div class="form-row"><div class="form-group"><label>药用部位</label><input type="text" name="part"></div>
                 <div class="form-group"><label>鉴定结论</label><input type="text" name="conclusion" value="正品 · 无掺假"></div></div>
             <div class="form-group"><label>产品描述</label><textarea name="description"></textarea></div>
+            <div class="form-group"><label>&#x1f33f; 药材图片</label>
+                <div class="upload-area" onclick="document.getElementById('fileProduct').click()"><p>&#x1f4c1; 上传药材图片</p><input type="file" id="fileProduct" name="image" accept="image/*" onchange="previewImage(this,'previewProduct')"></div>
+                <div class="preview" id="previewProduct"></div></div>
             <button type="submit" class="btn btn-success">&#x2795; 添加产品</button></form>
         <div class="result-msg" id="addResult"></div></div>
 
@@ -212,8 +228,21 @@ function doLogout(){localStorage.removeItem('adminToken');localStorage.removeIte
 function switchTab(el,pid){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});el.classList.add('active');document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});document.getElementById(pid).classList.add('active')}
 function previewImage(inp,pid){var p=document.getElementById(pid);p.innerHTML='';if(inp.files&&inp.files[0]){var r=new FileReader();r.onload=function(e){p.innerHTML='<img src="'+e.target.result+'">'};r.readAsDataURL(inp.files[0])}}
 
-document.getElementById('uploadForm').addEventListener('submit',function(e){e.preventDefault();var fd=new FormData(this),msg=document.getElementById('uploadResult');msg.className='result-msg loading';msg.textContent='上传中...';fetch('/admin/upload',{method:'POST',headers:AH(),body:fd}).then(function(r){return r.json()}).then(function(d){if(d.success){msg.className='result-msg success';msg.textContent='上传成功';loadProductList()}else{msg.className='result-msg error';msg.textContent=(d.error||'失败')}})});
-document.getElementById('addForm').addEventListener('submit',function(e){e.preventDefault();var d={};new FormData(this).forEach(function(v,k){d[k]=v});var msg=document.getElementById('addResult');msg.className='result-msg loading';msg.textContent='添加中...';fetch('/admin/products/add',{method:'POST',headers:AH({'Content-Type':'application/json'}),body:JSON.stringify(d)}).then(function(r){return r.json()}).then(function(d){if(d.success){msg.className='result-msg success';msg.textContent=d.message;loadProductList()}else{msg.className='result-msg error';msg.textContent=(d.error||'失败')}})});
+/* ===== 产品编码可搜索下拉 ===== */
+var productCodesCache=null;
+function loadProductCodes(cb){if(productCodesCache){cb&&cb(productCodesCache);return}fetch('/admin/products/codes',{headers:AH()}).then(function(r){return r.json()}).then(function(d){productCodesCache=d||[];cb&&cb(productCodesCache)}).catch(function(){cb&&cb([])})}
+function renderCodeList(filter){var list=document.getElementById('codeComboList');var codes=productCodesCache||[];var f=(filter||'').trim().toLowerCase();var items=f?codes.filter(function(c){return c.code.toLowerCase().indexOf(f)>=0||(c.name||'').toLowerCase().indexOf(f)>=0}):codes;var h='';items.forEach(function(c,i){h+='<div class="combobox-item'+(i===0?' active':'')+'" data-code="'+esc(c.code)+'" data-name="'+esc(c.name||'')+'"><strong>'+esc(c.code)+'</strong><span class="ci-name">'+esc(c.name||'')+'</span></div>'});list.innerHTML=h||'<div class="combobox-empty">无匹配产品编码</div>';list.style.display='block'}
+function selectCodeItem(el){var v=el.getAttribute('data-code');document.getElementById('codeComboValue').value=v;document.getElementById('codeComboInput').value=v+' '+el.getAttribute('data-name');document.getElementById('codeComboList').style.display='none'}
+(function(){var inp=document.getElementById('codeComboInput');if(!inp)return;var list=document.getElementById('codeComboList');
+inp.addEventListener('focus',function(){loadProductCodes(function(){renderCodeList(inp.value)})});
+inp.addEventListener('input',function(){renderCodeList(inp.value);document.getElementById('codeComboValue').value=''});
+inp.addEventListener('keydown',function(e){var items=list.querySelectorAll('.combobox-item');var activeIdx=-1;items.forEach(function(it,i){if(it.classList.contains('active'))activeIdx=i});if(e.key==='ArrowDown'){e.preventDefault();if(items.length){activeIdx=(activeIdx+1)%items.length;items.forEach(function(it,i){it.classList.toggle('active',i===activeIdx)})}}else if(e.key==='ArrowUp'){e.preventDefault();if(items.length){activeIdx=(activeIdx<=0?items.length-1:activeIdx-1);items.forEach(function(it,i){it.classList.toggle('active',i===activeIdx)})}}else if(e.key==='Enter'){e.preventDefault();if(items[activeIdx]){selectCodeItem(items[activeIdx]);inp.blur()}}else if(e.key==='Escape'){list.style.display='none'}});
+list.addEventListener('mousedown',function(e){var it=e.target.closest('.combobox-item');if(it)selectCodeItem(it)});
+document.addEventListener('click',function(e){if(!document.getElementById('codeCombo').contains(e.target))list.style.display='none'});
+})();
+
+document.getElementById('uploadForm').addEventListener('submit',function(e){e.preventDefault();var code=document.getElementById('codeComboValue').value,msg=document.getElementById('uploadResult');if(!code){msg.className='result-msg error';msg.textContent='请从下拉列表选择产品编码';return}var fd=new FormData(this),m=document.getElementById('uploadResult');m.className='result-msg loading';m.textContent='上传中...';fetch('/admin/upload',{method:'POST',headers:AH(),body:fd}).then(function(r){return r.json()}).then(function(d){if(d.success){m.className='result-msg success';m.textContent='上传成功';loadProductList()}else{m.className='result-msg error';m.textContent=(d.error||'失败')}})});
+document.getElementById('addForm').addEventListener('submit',function(e){e.preventDefault();var fd=new FormData(this),msg=document.getElementById('addResult');msg.className='result-msg loading';msg.textContent='添加中...';fetch('/admin/products/add',{method:'POST',headers:AH(),body:fd}).then(function(r){return r.json()}).then(function(d){if(d.success){msg.className='result-msg success';msg.textContent=d.message;this.reset();loadProductList()}else{msg.className='result-msg error';msg.textContent=(d.error||'失败')}}.bind(this)).catch(function(){msg.className='result-msg error';msg.textContent='网络错误'})});
 
 function switchContentForm(t){document.getElementById('ctPolicyFields').style.display=(t==='policy'||t==='news')?'block':'none';document.getElementById('ctAnnounceFields').style.display=t==='announce'?'block':'none'}
 /* ===== 三级省市区联动 ===== */
