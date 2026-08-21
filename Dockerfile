@@ -20,5 +20,6 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/spectrum-1.0.0.jar app.jar
 EXPOSE 8080
-ENV JAVA_OPTS=""
+# 容器感知内存：堆上限取容器内存的 75%（可被 Railway 的 JAVA_OPTS 环境变量覆盖）
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -XX:InitialRAMPercentage=40.0"
 CMD ["sh", "-c", "java $JAVA_OPTS -jar app.jar --spring.profiles.active=prod"]

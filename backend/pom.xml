@@ -40,12 +40,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- 文件上传 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-
         <!-- 对象存储（S3 兼容，如 Cloudflare R2） -->
         <dependency>
             <groupId>io.minio</groupId>
