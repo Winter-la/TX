@@ -177,6 +177,12 @@ PYEOF
 py_form_post "新增测试产品 TST001(含中文+药材图片)" "/admin/products/add" '{"code":"TST001","name":"测试药材","type":"中草药","origin":"测试产地"}' "$ADMIN_TOKEN" image:smoke_tmp/test.png
 resp=$(json_get "/api/query?code=TST001")
 echo "$resp" | python -c "import sys,json; d=json.load(sys.stdin); sys.exit(0 if d.get('product',{}).get('image') else 1)" && pass "产品查询返回药材图片" || fail "药材图片" "$resp"
+resp=$(python "$TMPDIR/httputil.py" POST "$BASE/admin/products/image" '{"code":"TST001"}' "$ADMIN_TOKEN" form image:smoke_tmp/test.png)
+echo "$resp" | python -c "import sys,json; sys.exit(0 if json.load(sys.stdin).get('success') is True else 1)" && pass "为已有产品重新设置图片" || fail "设置产品图片" "$resp"
+resp=$(python "$TMPDIR/httputil.py" POST "$BASE/admin/products/image" '{"code":"TST001"}' "$ADMIN_TOKEN" form image:smoke_tmp/time.txt)
+echo "$resp" | python -c "import sys,json; sys.exit(0 if '图片' in json.load(sys.stdin).get('error','') else 1)" && pass "产品图片拒绝非图片文件" || fail "非图片产品图" "$resp"
+resp=$(python "$TMPDIR/httputil.py" POST "$BASE/admin/products/image" '{"code":"NOPE999"}' "$ADMIN_TOKEN" form image:smoke_tmp/test.png)
+echo "$resp" | python -c "import sys,json; sys.exit(0 if '不存在' in json.load(sys.stdin).get('error','') else 1)" && pass "给不存在产品设置图片被拒" || fail "不存在产品设图" "$resp"
 resp=$(curl -s -m 10 -X POST "$BASE/admin/products/add" -H "Authorization: Bearer $ADMIN_TOKEN" -F "code=TST001" -F "name=dup")
 echo "$resp" | python -c "import sys,json; sys.exit(0 if '已存在' in json.load(sys.stdin).get('error','') else 1)" && pass "重复产品码被拒绝" || fail "重复产品码" "$resp"
 resp=$(python "$TMPDIR/httputil.py" POST "$BASE/admin/products/add" '{"code":"DUPNAME","name":"测试药材"}' "$ADMIN_TOKEN" form)

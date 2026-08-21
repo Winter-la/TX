@@ -114,6 +114,7 @@ public class AdminController {
             m.put("name", p.getName());
             m.put("type", p.getType());
             m.put("origin", p.getOrigin());
+            m.put("image", p.getImage());
             recordRepo.findFirstByProductIdOrderByTestDateDesc(p.getId()).ifPresent(r -> {
                 m.put("match_rate", r.getMatchRate());
                 m.put("grade", r.getGrade());
@@ -136,6 +137,38 @@ public class AdminController {
                     return m;
                 })
                 .toList();
+    }
+
+    /**
+     * 为已有产品设置/更换药材图片（JWT保护）
+     * POST /admin/products/image   multipart: code + image
+     */
+    @PostMapping("/products/image")
+    public Map<String, Object> setProductImage(
+            @RequestParam String code,
+            @RequestParam(required = false) MultipartFile image) {
+        if (code == null || code.isBlank()) return Map.of("error", "产品编码不能为空");
+        Product p = productRepo.findByCode(code.trim()).orElse(null);
+        if (p == null) return Map.of("error", "产品不存在: " + code);
+        if (image == null || image.isEmpty()) return Map.of("error", "请选择要上传的图片");
+        if (!isImageFile(image))
+            return Map.of("error", "药材图片仅支持图片格式（png/jpg/jpeg/gif/webp/bmp）");
+
+        String safeCode = code.trim().replaceAll("[^A-Za-z0-9_-]", "_");
+        String filename = safeCode + "_product" + getExtension(image.getOriginalFilename());
+        try {
+            String url = storageService.store("products", filename, image.getInputStream(), image.getSize());
+            String oldRef = p.getImage();
+            p.setImage(url);
+            productRepo.save(p);
+            // 删除旧图片文件（忽略失败，避免影响主流程）
+            if (oldRef != null && !oldRef.isBlank() && !oldRef.equals(url)) {
+                try { storageService.delete(oldRef); } catch (IOException ignore) {}
+            }
+            return Map.of("success", true, "message", "产品图片已更新", "image", url);
+        } catch (IOException e) {
+            return Map.of("error", "图片上传失败: " + e.getMessage());
+        }
     }
 
     @PostMapping("/products/add")
